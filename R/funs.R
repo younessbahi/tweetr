@@ -199,10 +199,11 @@ tw_entity_clean <- function(tweets) {
   tw.media           <- tw.media_ %>% select(- c(indices, original_info, sizes))
   
   ## GEO ####
-  tw.geo <-
-    if (all_na(tweets[['geo']])) {
-      list()
+  
+  if (all_na(tweets[['geo']])) {
+    tw.geo <-list()
     } else {
+    tw.geo <-
       tweets %>%
         select(id_str, user_id_str, geo) %>%
         pluck('geo') %>%
