@@ -40,7 +40,7 @@ get_tweets <-
            .replies = F, .minLikes = NA, .minReplies = NA, .minRetweets = NA, .verified = F, .hasImage = F, .hasVideo = F,
            .hasMedia = F, .hasLinks = F, .url = NA, .count = '-1') {
     
-    q.clean_ <- tweetr::query(query, .lat, .long, .radius, .place, .since, .until, .from, .to, .replies, .minLikes,
+    q.clean_ <- tweetr:::query(query, .lat, .long, .radius, .place, .since, .until, .from, .to, .replies, .minLikes,
                               .minReplies, .minRetweets, .verified, .hasImage, .hasVideo, .hasMedia, .hasLinks, .url)
     
     #colRm <- load('data/colRm.rda')
@@ -99,14 +99,14 @@ get_tweets <-
         select(rowID, tweets, users)
     
     tw.list <-
-      tweetr::tidy_(res.tidy$tweets) %>%
+      tweetr:::tidy_(res.tidy$tweets) %>%
         mutate(
           at_GMT_time = tweetr:::parse_datetime(created_at) + 3600,
           at_UTC_time = tweetr:::parse_datetime(created_at)
         )
     
     users.list <-
-      tweetr::tidy_(res.tidy$users) %>%
+      tweetr:::tidy_(res.tidy$users) %>%
         mutate(
           created_at = tweetr:::parse_datetime(created_at) + 3600
         )

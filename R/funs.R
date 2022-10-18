@@ -1,4 +1,5 @@
 #' Helper function to unnest nested dataframe in list.
+#' @rdname get_tweets
 #' @keywords internal
 #' @param .x A list vector.
 #' @noRd
@@ -9,6 +10,7 @@ tidy_ <- function(.x) {
 }
 
 #' Helper function to format datetime.
+#' @rdname get_tweets
 #' @keywords internal
 #' @param str_date A character date, (example: "Thu Oct 16 20:16:47 +0000 2022")
 #' @noRd
@@ -25,8 +27,8 @@ score_ <- function(keyword) {
   
   q <- 'science'
   
-  cookies <- tweetr::set_cookies(q = q)
-  header  <- tweetr::header_score(data = cookies, q = q)
+  cookies <- tweetr:::set_cookies(q = q)
+  header  <- tweetr:::header_score(data = cookies, q = q)
   
   params <-
     list(
@@ -52,9 +54,10 @@ score_ <- function(keyword) {
 #' @param id Location ID.
 #' @noRd
 trends_ <- function(id) {
+  
   keyword <- 'science'
-  cookies <- tweetr::set_cookies(q = keyword)
-  header  <- tweetr::header_trends(cookies, q = keyword)
+  cookies <- tweetr:::set_cookies(q = keyword)
+  header  <- tweetr:::header_trends(cookies, q = keyword)
   
   params = list(
     `id` = id #get place id from locID.rds
