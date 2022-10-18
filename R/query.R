@@ -1,3 +1,5 @@
+#' @rdname get_tweets
+#' @keywords internal
 #' @noRd
 query <- function(query, .lat, .long, .radius, .place, .since, .until, .from, .to, .replies, .minLikes,
                   .minReplies, .minRetweets, .verified, .hasImage, .hasVideo, .hasMedia, .hasLinks, .url) {

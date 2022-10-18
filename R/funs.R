@@ -17,6 +17,7 @@ parse_datetime <- function(str_date) {
 }
 
 #' Helper function to scrape search influence scores.
+#' @rdname get_score
 #' @keywords internal
 #' @param keyword A search term or a hashtag.
 #' @noRd
@@ -46,6 +47,7 @@ score_ <- function(keyword) {
 }
 
 #' Helper function to scrape trend.
+#' @rdname get_trends
 #' @keywords internal
 #' @param id Location ID.
 #' @noRd
@@ -71,6 +73,7 @@ trends_ <- function(id) {
 }
 
 #' Helper function to clean tweets entities.
+#' @rdname get_tweets
 #' @keywords internal
 #' @param tweets Tweets dataframe.
 #' @noRd
@@ -226,6 +229,7 @@ tw_entity_clean <- function(tweets) {
 }
 
 #' Helper function to clean user entity.
+#' @rdname get_tweets
 #' @keywords internal
 #' @param users Users dataframe
 #' @noRd
