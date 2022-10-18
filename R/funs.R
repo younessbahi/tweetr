@@ -1,4 +1,5 @@
 #' Helper function to unnest nested dataframe in list.
+#' @keywords internal
 #' @param .x A list vector.
 #' @noRd
 tidy_ <- function(.x) {
@@ -8,6 +9,7 @@ tidy_ <- function(.x) {
 }
 
 #' Helper function to format datetime.
+#' @keywords internal
 #' @param str_date A character date, (example: "Thu Oct 16 20:16:47 +0000 2022")
 #' @noRd
 parse_datetime <- function(str_date) {
@@ -15,6 +17,7 @@ parse_datetime <- function(str_date) {
 }
 
 #' Helper function to scrape search influence scores.
+#' @keywords internal
 #' @param keyword A search term or a hashtag.
 #' @noRd
 score_ <- function(keyword) {
@@ -43,6 +46,7 @@ score_ <- function(keyword) {
 }
 
 #' Helper function to scrape trend.
+#' @keywords internal
 #' @param id Location ID.
 #' @noRd
 trends_ <- function(id) {
@@ -67,6 +71,7 @@ trends_ <- function(id) {
 }
 
 #' Helper function to clean tweets entities.
+#' @keywords internal
 #' @param tweets Tweets dataframe.
 #' @noRd
 tw_entity_clean <- function(tweets) {
@@ -221,6 +226,7 @@ tw_entity_clean <- function(tweets) {
 }
 
 #' Helper function to clean user entity.
+#' @keywords internal
 #' @param users Users dataframe
 #' @noRd
 usr_entity_clean <- function(users) {

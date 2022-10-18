@@ -1,3 +1,5 @@
+#' @keywords internal
+#' @noRd
 set_cookies <- function(q) {
   
   q.parse = urltools::url_encode(q)

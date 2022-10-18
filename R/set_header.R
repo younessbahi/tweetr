@@ -1,3 +1,5 @@
+#' @keywords internal
+#' @noRd
 header_trends <- function(data, q) {
   
   q.parse = urltools::url_encode(q)

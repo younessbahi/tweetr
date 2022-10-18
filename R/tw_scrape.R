@@ -1,3 +1,4 @@
+#' @keywords internal
 #' @noRd
 tw_scrape <- function(count, header, cookies, params) {
   
