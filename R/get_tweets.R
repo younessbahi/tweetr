@@ -47,8 +47,8 @@ get_tweets <-
     
     q.parse_ = urltools::url_encode(q.clean_)
     
-    cookies <- tweetr::set_cookies(q = q.parse_)
-    header  <- tweetr::header_tweets(cookies, q = q.parse_)
+    cookies <- tweetr:::set_cookies(q = q.parse_)
+    header  <- tweetr:::header_tweets(cookies, q = q.parse_)
     
     params <- list(
       `include_profile_interstitial_type`    = '1',
@@ -87,7 +87,7 @@ get_tweets <-
       `ext`                                  = 'mediaStats,highlightedLabel,hasNftAvatar,voiceInfo,enrichments,superFollowMetadata,unmentionInfo,editControl,collab_control,vibe'
     )
     
-    res <- tweetr::tw_scrape(count = .count, header, cookies, params)
+    res <- tweetr:::tw_scrape(count = .count, header, cookies, params)
     
     res.tidy <-
       res %>%
@@ -101,22 +101,22 @@ get_tweets <-
     tw.list <-
       tweetr::tidy_(res.tidy$tweets) %>%
         mutate(
-          at_GMT_time = tweetr::parse_datetime(created_at) + 3600,
-          at_UTC_time = tweetr::parse_datetime(created_at)
+          at_GMT_time = tweetr:::parse_datetime(created_at) + 3600,
+          at_UTC_time = tweetr:::parse_datetime(created_at)
         )
     
     users.list <-
       tweetr::tidy_(res.tidy$users) %>%
         mutate(
-          created_at = tweetr::parse_datetime(created_at) + 3600
+          created_at = tweetr:::parse_datetime(created_at) + 3600
         )
     
     index_rm <- cRm[which(cRm$to_rm %in% names(users.list)),]$to_rm
     users.list %<>% select(- all_of(index_rm))
-    user.url <- tweetr::usr_entity_clean(users = users.list)
+    user.url <- tweetr:::usr_entity_clean(users = users.list)
     users.list %<>% select(- entities)
     
-    tw_entity <- tweetr::tw_entity_clean(tweets = tw.list)
+    tw_entity <- tweetr:::tw_entity_clean(tweets = tw.list)
     tw.list %<>%
       select(- c(rowID, created_at, entities, extended_entities, ext, ext_edit_control)) %>%
       arrange(desc(at_GMT_time)) %>%
