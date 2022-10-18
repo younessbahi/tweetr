@@ -200,7 +200,7 @@ tw_entity_clean <- function(tweets) {
   
   ## GEO ####
   
-  if (all_na(tweets[['geo']])) {
+  if (is.null(tweets[['geo']])) {
     tw.geo <-list()
     } else {
     tw.geo <-
@@ -217,7 +217,6 @@ tw_entity_clean <- function(tweets) {
         na.omit()
       
       tw.geo$id_str <- pull(tweets[tw.geo$name, 'id_str'])
-      tw.geo        <- tw.geo
     }
   
   return(
