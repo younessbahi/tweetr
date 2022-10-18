@@ -7,7 +7,7 @@ set_cookies <- function(q) {
   
   q.parse = urltools::url_encode(q)
   
-  chromote::set_chrome_args(c('--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox'))
+  #chromote::set_chrome_args(c('--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox'))
   
   tryCatch({
     chromote::ChromoteSession$new()
