@@ -2,7 +2,7 @@
 #' @rdname get_trends
 #' @rdname get_score
 #' @keywords internal
-#' @noRd
+
 set_cookies <- function(q) {
   
   q.parse = urltools::url_encode(q)

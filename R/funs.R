@@ -2,7 +2,7 @@
 #' @rdname get_tweets
 #' @keywords internal
 #' @param .x A list vector.
-#' @noRd
+
 tidy_ <- function(.x) {
   unlist(.x, recursive = F) %>%
     enframe('rowID') %>%
@@ -13,7 +13,7 @@ tidy_ <- function(.x) {
 #' @rdname get_tweets
 #' @keywords internal
 #' @param str_date A character date, (example: "Thu Oct 16 20:16:47 +0000 2022")
-#' @noRd
+
 parse_datetime <- function(str_date) {
   as.POSIXct(str_date, format = "%a %b %d %H:%M:%S +0000 %Y", tz = "GMT")
 }
@@ -22,7 +22,7 @@ parse_datetime <- function(str_date) {
 #' @rdname get_score
 #' @keywords internal
 #' @param keyword A search term or a hashtag.
-#' @noRd
+
 score_ <- function(keyword) {
   
   q <- 'science'
@@ -52,7 +52,7 @@ score_ <- function(keyword) {
 #' @rdname get_trends
 #' @keywords internal
 #' @param id Location ID.
-#' @noRd
+
 trends_ <- function(id) {
   
   keyword <- 'science'
@@ -79,7 +79,7 @@ trends_ <- function(id) {
 #' @rdname get_tweets
 #' @keywords internal
 #' @param tweets Tweets dataframe.
-#' @noRd
+
 tw_entity_clean <- function(tweets) {
   entities <-
     tweets %>%
@@ -235,7 +235,7 @@ tw_entity_clean <- function(tweets) {
 #' @rdname get_tweets
 #' @keywords internal
 #' @param users Users dataframe
-#' @noRd
+
 usr_entity_clean <- function(users) {
   
   entities_usr <-

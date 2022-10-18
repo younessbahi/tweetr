@@ -1,6 +1,6 @@
 #' @rdname get_tweets
 #' @keywords internal
-#' @noRd
+
 tw_scrape <- function(count, header, cookies, params) {
   
   empty  = list()
