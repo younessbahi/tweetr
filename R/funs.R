@@ -114,13 +114,6 @@ tw_entity_clean <- function(tweets) {
   hashtags$id_str <- pull(tweets[hashtags$rowID, "id_str"])
   
   hashtags <- hashtags
-  # hashtags_ <-
-  #   hashtags %>%
-  #     select(- rowID) %>%
-  #     group_by(id_str) %>%
-  #     summarise(hashtags = list(hashtags))
-  
-  #tw.list <- left_join(tweets, hashtags_, by = "id_str")
   
   ## URLS ####
   tw.urls <-
@@ -137,20 +130,10 @@ tw_entity_clean <- function(tweets) {
   
   tw.urls$id_str <- pull(tweets[tw.urls$rowID, "id_str"])
   
-  # tw.urls_ <-
-  #   tw.urls %>%
-  #     select(- c(rowID, url, indices)) %>%
-  #     group_by(id_str) %>%
-  #     summarise(
-  #       expanded_url = list(expanded_url),
-  #       display_url  = list(display_url)
-  #     )
-  
-  #tw.list <<- left_join(tw.list, tw.urls_, by = "id_str")
-  
   if (any(names(tw.urls) == 'indices')) {
     tw.urls %<>% select(- indices)
   }
+  
   tw.urls %<>% filter(!is.na(expanded_url))
   
   ## Mentions ####
