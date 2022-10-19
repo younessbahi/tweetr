@@ -131,7 +131,7 @@ get_tweets <-
         tweets_count       = nrow(tw.list),
         unique_users_count = length(unique(users.list$id_str)),
         tweets             = list(
-          items    = tw_entity$tw.list,
+          items    = tw.list,
           hashtags = tw_entity$hashtags,
           mentions = tw_entity$mentions,
           urls     = tw_entity$tw.urls,
