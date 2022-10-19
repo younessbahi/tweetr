@@ -117,6 +117,7 @@ get_tweets <-
     users.list %<>% select(- entities)
     
     tw_entity <- tweetr:::tw_entity_clean(tweets = tw.list)
+    
     tw.list %<>%
       select(- c(rowID, created_at, entities, extended_entities, ext, ext_edit_control)) %>%
       arrange(desc(at_GMT_time)) %>%
