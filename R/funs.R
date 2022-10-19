@@ -2,6 +2,7 @@
 #' @rdname get_tweets
 #' @keywords internal
 #' @param .x A list vector.
+#' @noRd
 
 tidy_ <- function(.x) {
   unlist(.x, recursive = F) %>%
@@ -13,6 +14,7 @@ tidy_ <- function(.x) {
 #' @rdname get_tweets
 #' @keywords internal
 #' @param str_date A character date, (example: "Thu Oct 16 20:16:47 +0000 2022")
+#' @noRd
 
 parse_datetime <- function(str_date) {
   as.POSIXct(str_date, format = "%a %b %d %H:%M:%S +0000 %Y", tz = "GMT")
@@ -22,6 +24,7 @@ parse_datetime <- function(str_date) {
 #' @rdname get_score
 #' @keywords internal
 #' @param keyword A search term or a hashtag.
+#' @noRd
 
 score_ <- function(keyword) {
   
@@ -52,6 +55,7 @@ score_ <- function(keyword) {
 #' @rdname get_trends
 #' @keywords internal
 #' @param id Location ID.
+#' @noRd
 
 trends_ <- function(id) {
   
@@ -79,6 +83,7 @@ trends_ <- function(id) {
 #' @rdname get_tweets
 #' @keywords internal
 #' @param tweets Tweets dataframe.
+#' @noRd
 
 tw_entity_clean <- function(tweets) {
   entities <-
@@ -146,7 +151,7 @@ tw_entity_clean <- function(tweets) {
   if (any(names(tw.urls) == 'indices')) {
     tw.urls %<>% select(- indices)
   }
-  tw.urls <- tw.urls # %>% select(- indices)
+  tw.urls %<>% filter(!is.na(expanded_url))
   
   ## Mentions ####
   #/ linkage with tweets rowID /
@@ -175,7 +180,7 @@ tw_entity_clean <- function(tweets) {
     mentions %<>% select(- indices)
   }
   
-  mentions <- mentions
+  mentions %<>% filter(!is.na(id))
   
   ## MEDIAS ####
   tw.media <-
@@ -196,7 +201,10 @@ tw_entity_clean <- function(tweets) {
       unnest_wider(value)
   
   tw.media_$id_tweet <- pull(tweets[tw.media_$rowID, 'id_str'])
-  tw.media           <- tw.media_ %>% select(- c(indices, original_info, sizes))
+  tw.media <-
+    tw.media_ %>%
+      select(- c(indices, original_info, sizes)) %>%
+      filter(!is.na(id_str))
   
   ## GEO ####
   
@@ -235,6 +243,7 @@ tw_entity_clean <- function(tweets) {
 #' @rdname get_tweets
 #' @keywords internal
 #' @param users Users dataframe
+#' @noRd
 
 usr_entity_clean <- function(users) {
   

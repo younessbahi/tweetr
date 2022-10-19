@@ -1,7 +1,9 @@
+#' @import devtools
 #' @rdname get_tweets
 #' @rdname get_trends
 #' @rdname get_score
 #' @keywords internal
+#' @noRd
 
 set_cookies <- function(q) {
   
@@ -13,8 +15,7 @@ set_cookies <- function(q) {
     chromote::ChromoteSession$new()
   },
     error   = function(e) {
-      unload('chromote')
-      library(chromote, verbose=F)
+      devtools::unload('chromote')
     },
     finally = {
       b <- chromote::ChromoteSession$new()
@@ -31,7 +32,8 @@ set_cookies <- function(q) {
   cookies_ <- b$Network$getCookies()
   cookies_ <- cookies_$cookies
   
-  b$close()
+  #b$close()
+  b$.__enclos_env__$self$close()
   rm(b)
   
   nm       <- unlist(lapply(cookies_, '[[', 1))
