@@ -1,5 +1,5 @@
-# Tweetr
 
+# Tweetr <a href='https://github.com/younessbahi/tweetr/blob/main/'><img src='man/figures/logo.png' align="right" height="139" /></a>
 A Twitter scraping package that enables the collection of Tweets and other data without using the Twitter's API.
 
 ### Some of the benefits from using the tweetr package:
