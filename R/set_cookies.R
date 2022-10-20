@@ -38,7 +38,6 @@ set_cookies <- function(q) {
     }
   )
   
-  #b$close()
   b$close()
   rm(b)
   

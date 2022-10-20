@@ -117,7 +117,7 @@ get_tweets <-
             at_UTC_time = tweetr:::parse_datetime(created_at)
           )
       
-      tw_entity <- tweetr:::tw_entity_clean(tweets = tw.list)
+      tw_entity <- suppressMessages(tweetr:::tw_entity_clean(tweets = tw.list))
       
       tw.list %<>%
         select(- c(rowID, created_at, entities, ext, ext_edit_control)) %>%
@@ -146,7 +146,7 @@ get_tweets <-
       
       index_rm <- cRm[which(cRm$to_rm %in% names(users.list)),]$to_rm
       users.list %<>% select(- all_of(index_rm))
-      user.url <- tweetr:::usr_entity_clean(users = users.list)
+      user.url <- suppressMessages(tweetr:::usr_entity_clean(users = users.list))
       users.list %<>% select(- entities)
     }
     
