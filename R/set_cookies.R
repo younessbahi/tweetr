@@ -16,7 +16,7 @@ set_cookies <- function(q) {
     chromote::ChromoteSession$new
   },
     error   = function(e) {
-      stop("Please check you internet or try again!")
+      stop("Please try again!")
     },
     finally = {
       b                <- chromote::ChromoteSession$new()
@@ -36,7 +36,6 @@ set_cookies <- function(q) {
         }
       )
     }
-  
   )
   
   #b$close()
