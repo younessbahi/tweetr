@@ -41,7 +41,7 @@ get_tweets <-
            .hasMedia = F, .hasLinks = F, .url = NA, .count = '-1') {
     
     q.clean_ <- tweetr:::query(query, .lat, .long, .radius, .place, .since, .until, .from, .to, .replies, .minLikes,
-                              .minReplies, .minRetweets, .verified, .hasImage, .hasVideo, .hasMedia, .hasLinks, .url)
+                               .minReplies, .minRetweets, .verified, .hasImage, .hasVideo, .hasMedia, .hasLinks, .url)
     
     #colRm <- load('data/colRm.rda')
     
@@ -98,34 +98,58 @@ get_tweets <-
         unnest_wider(globalObjects) %>%
         select(rowID, tweets, users)
     
-    tw.list <-
-      tweetr:::tidy_(res.tidy$tweets) %>%
-        mutate(
-          at_GMT_time = tweetr:::parse_datetime(created_at) + 3600,
-          at_UTC_time = tweetr:::parse_datetime(created_at)
-        )
-    
-    users.list <-
-      tweetr:::tidy_(res.tidy$users) %>%
-        mutate(
-          created_at = tweetr:::parse_datetime(created_at) + 3600
-        )
-    
-    index_rm <- cRm[which(cRm$to_rm %in% names(users.list)),]$to_rm
-    users.list %<>% select(- all_of(index_rm))
-    user.url <- tweetr:::usr_entity_clean(users = users.list)
-    users.list %<>% select(- entities)
-    
-    tw_entity <- tweetr:::tw_entity_clean(tweets = tw.list)
-    
-    tw.list %<>%
-      select(- c(rowID, created_at, entities, extended_entities, ext, ext_edit_control)) %>%
-      arrange(desc(at_GMT_time)) %>%
-      relocate(at_GMT_time, at_UTC_time)
-    
-    if (any(names(tw.list) == 'display_text_range')) {
-      tw.list %<>% select(- display_text_range)
+    if (all_na(res.tidy$tweets)) {
+      
+      tw.list <- list()
+      tw_entity <- list()
+      tw_entity$hashtags <- list()
+      tw_entity$mentions <- list()
+      tw_entity$tw.urls <- list()
+      tw_entity$tw.media <- list()
+      tw_entity$geo <- list()
+      
+    } else {
+      
+      tw.list <-
+        tweetr:::tidy_(res.tidy$tweets) %>%
+          mutate(
+            at_GMT_time = tweetr:::parse_datetime(created_at) + 3600,
+            at_UTC_time = tweetr:::parse_datetime(created_at)
+          )
+      
+      tw_entity <- tweetr:::tw_entity_clean(tweets = tw.list)
+      
+      tw.list %<>%
+        select(- c(rowID, created_at, entities, extended_entities, ext, ext_edit_control)) %>%
+        arrange(desc(at_GMT_time)) %>%
+        relocate(at_GMT_time, at_UTC_time)
+  
+      if (any(names(tw.list) == 'display_text_range')) {
+        tw.list %<>% select(- display_text_range)
+        
+      }
     }
+    
+    if (all_na(res.tidy$users)) {
+      
+      users.list <- list()
+      user.url <- list()
+      
+    } else {
+      users.list <-
+        tweetr:::tidy_(res.tidy$users) %>%
+          mutate(
+            created_at = tweetr:::parse_datetime(created_at) + 3600
+          )
+      
+      index_rm <- cRm[which(cRm$to_rm %in% names(users.list)),]$to_rm
+      users.list %<>% select(- all_of(index_rm))
+      user.url <- tweetr:::usr_entity_clean(users = users.list)
+      users.list %<>% select(- entities)
+    }
+    
+    
+    
     
     return(
       list(
