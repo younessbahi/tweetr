@@ -22,14 +22,21 @@ set_cookies <- function(q) {
       b                <- chromote::ChromoteSession$new()
       userAgent_mobile <- " Chrome/55.0.2883.87 Safari/537.36"
       b$Network$setUserAgentOverride(userAgent = userAgent_mobile)
-    {
-      b$Page$navigate(glue::glue("https://twitter.com/search?q={q.parse}&src=typed_query&f=live"));
-      b$Page$loadEventFired(wait_ = TRUE)
+      tryCatch(
+      {
+        b$Page$navigate(glue::glue("https://twitter.com/search?q={q.parse}&src=typed_query&f=live"));
+        b$Page$loadEventFired(wait_ = TRUE)
+      },
+        error   = function(e) {
+          stop('INTERNET DISCONNECTED - Please check your internet connection and retry!')
+        },
+        finally = {
+          cookies_ <- b$Network$getCookies()
+          cookies_ <- cookies_$cookies
+        }
+      )
     }
-      
-      cookies_ <- b$Network$getCookies()
-      cookies_ <- cookies_$cookies
-    }
+  
   )
   
   #b$close()
