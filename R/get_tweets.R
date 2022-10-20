@@ -120,13 +120,15 @@ get_tweets <-
       tw_entity <- tweetr:::tw_entity_clean(tweets = tw.list)
       
       tw.list %<>%
-        select(- c(rowID, created_at, entities, extended_entities, ext, ext_edit_control)) %>%
+        select(- c(rowID, created_at, entities, ext, ext_edit_control)) %>%
         arrange(desc(at_GMT_time)) %>%
         relocate(at_GMT_time, at_UTC_time)
   
       if (any(names(tw.list) == 'display_text_range')) {
         tw.list %<>% select(- display_text_range)
-        
+      }
+      if (any(names(tw.list) == 'extended_entities')) {
+        tw.list %<>% select(- extended_entities)
       }
     }
     

@@ -94,47 +94,62 @@ tw_entity_clean <- function(tweets) {
   
   ## Hashtags ####
   #/ linkage with tweets rowID /
-  hashtags <-
-    entities %>%
-      select(name, hashtags,) %>%
-      rename(rowID = name)
   
-  hashtags$hashtags <- map_depth(hashtags$hashtags, 2, ~ .$text)
   
-  hashtags$hashtags <-
-    lapply(
-      hashtags$hashtags,
-      function(e) { if (is_empty(e)) NA else e }
-    )
-  
-  hashtags %<>%
-    unnest(cols = hashtags) %>%
-    unnest(cols = hashtags)
-  
-  hashtags$id_str <- pull(tweets[hashtags$rowID, "id_str"])
-  
-  hashtags <- hashtags
-  
-  ## URLS ####
-  tw.urls <-
-    entities %>%
-      select(name, urls) %>%
-      rename(rowID = name)
-  
-  tw.urls$urls <- lapply(tw.urls$urls, function(e) { if (is_empty(e)) NA else e })
-  
-  tw.urls <-
-    tw.urls %>%
-      unnest(cols = 'urls') %>%
-      unnest_wider('urls')
-  
-  tw.urls$id_str <- pull(tweets[tw.urls$rowID, "id_str"])
-  
-  if (any(names(tw.urls) == 'indices')) {
-    tw.urls %<>% select(- indices)
+  if (all_na(entities$hashtags)) {
+    
+    hashtags <- list()
+    
+  } else {
+    
+    hashtags <-
+      entities %>%
+        select(name, hashtags) %>%
+        rename(rowID = name)
+    
+    hashtags$hashtags <- map_depth(hashtags$hashtags, 2, ~ .$text)
+    
+    hashtags$hashtags <-
+      lapply(
+        hashtags$hashtags,
+        function(e) { if (is_empty(e)) NA else e }
+      )
+    
+    hashtags %<>%
+      unnest(cols = hashtags) %>%
+      unnest(cols = hashtags)
+    
+    hashtags$id_str <- pull(tweets[hashtags$rowID, "id_str"])
   }
   
-  tw.urls %<>% filter(!is.na(expanded_url))
+  ## URLS ####
+  
+  if (all_na(entities$urls)) {
+    
+    tw.urls <- list()
+    
+  } else {
+  
+    tw.urls <-
+      entities %>%
+        select(name, urls) %>%
+        rename(rowID = name)
+    
+    tw.urls$urls <- lapply(tw.urls$urls, function(e) { if (is_empty(e)) NA else e })
+    
+    tw.urls <-
+      tw.urls %>%
+        unnest(cols = 'urls') %>%
+        unnest_wider('urls')
+    
+    tw.urls$id_str <- pull(tweets[tw.urls$rowID, "id_str"])
+    
+    if (any(names(tw.urls) == 'indices')) {
+      tw.urls %<>% select(- indices)
+    }
+    
+    tw.urls %<>% filter(! is.na(expanded_url))
+  }
   
   ## Mentions ####
   #/ linkage with tweets rowID /
@@ -156,16 +171,27 @@ tw_entity_clean <- function(tweets) {
     mutate(rowID = mentions$name) %>%
     unnest_wider(value)
   
-  mentions$id_str <- pull(tweets[mentions$rowID, "id_str"])
-  mentions$id     <- as.character(mentions$id)
+  if (length(mentions) < 6) {
+    
+    mentions <- list()
+    
+  } else {
+    
+    mentions$id_str <- pull(tweets[mentions$rowID, "id_str"])
+    mentions$id     <- as.character(mentions$id)
   
-  if (any(names(mentions) == 'indices')) {
-    mentions %<>% select(- indices)
+    if (any(names(mentions) == 'indices')) {
+      mentions %<>% select(- indices)
+    }
+  
+    mentions %<>% filter(! is.na(id))
+  
   }
   
-  mentions %<>% filter(!is.na(id))
-  
   ## MEDIAS ####
+  
+  if (any(names(entities) == 'media')) {
+  
   tw.media <-
     entities %>%
       select(name, media) %>%
@@ -187,13 +213,21 @@ tw_entity_clean <- function(tweets) {
   tw.media <-
     tw.media_ %>%
       select(- c(indices, original_info, sizes)) %>%
-      filter(!is.na(id_str))
+      filter(! is.na(id_str))
+    
+  } else {
+    
+    tw.media <- list()
+    
+  }
   
   ## GEO ####
-  
   if (is.null(tweets[['geo']])) {
-    tw.geo <-list()
-    } else {
+    
+    tw.geo <- list()
+    
+  } else {
+    
     tw.geo <-
       tweets %>%
         select(id_str, user_id_str, geo) %>%
@@ -206,9 +240,9 @@ tw_entity_clean <- function(tweets) {
         unnest_wider(value) %>%
         set_colnames(c('name', 'lat', 'long')) %>%
         na.omit()
-      
-      tw.geo$id_str <- pull(tweets[tw.geo$name, 'id_str'])
-    }
+    
+    tw.geo$id_str <- pull(tweets[tw.geo$name, 'id_str'])
+  }
   
   return(
     list(
@@ -236,32 +270,39 @@ usr_entity_clean <- function(users) {
       enframe() %>%
       unnest_wider(value)
   
-  user.url_ <-
-    entities_usr %>%
-      select(name, url) %>%
-      rename(rowID = name)
-  
-  user.url <-
-    user.url_ %>%
-      pluck('url') %>%
+  if (any(names(entities_usr) == 'url')) {
+    
+    user.url_ <-
+      entities_usr %>%
+        select(name, url) %>%
+        rename(rowID = name)
+    
+    user.url <-
+      user.url_ %>%
+        pluck('url') %>%
+        enframe('rowID')
+    
+    user.url$value <- lapply(user.url$value, function(e) { if (is_empty(e)) NA else e })
+    user.url %<>%
+      unnest(value) %>%
+      pluck('value') %>%
       enframe('rowID')
-  
-  user.url$value <- lapply(user.url$value, function(e) { if (is_empty(e)) NA else e })
-  user.url %<>%
-    unnest(value) %>%
-    pluck('value') %>%
-    enframe('rowID')
-  
-  user.url$value <- lapply(user.url$value, function(e) { if (is_empty(e)) NA else e })
-  user.url %<>%
-    unnest(value) %>%
-    unnest_wider(value) %>%
-    mutate(
-      rowID      = user.url_$rowID,
-      usr_id_str = pull(users[rowID, "id_str"])
-    ) %>%
-    select(- c(indices, rowID))
-  
+    
+    user.url$value <- lapply(user.url$value, function(e) { if (is_empty(e)) NA else e })
+    user.url %<>%
+      unnest(value) %>%
+      unnest_wider(value) %>%
+      mutate(
+        rowID      = user.url_$rowID,
+        usr_id_str = pull(users[rowID, "id_str"])
+      ) %>%
+      select(- c(indices, rowID))
+    
+  } else {
+    
+    user.url <- list()
+    
+  }
   return(user.url)
   
 }

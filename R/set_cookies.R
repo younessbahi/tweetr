@@ -13,38 +13,27 @@ set_cookies <- function(q) {
   
   tryCatch(
   {
-    chromote::ChromoteSession$new()
+    chromote::ChromoteSession$new
   },
     error   = function(e) {
-      devtools::unload('chromote')
-      require(chromote, quietly = T)
+      stop("Please check you internet or try again!")
     },
     finally = {
-      tryCatch(
-      {
-        chromote::ChromoteSession$new
-      },
-        error   = function(e) {
-          stop("Please check you internet or try again!")
-        },
-        finally = {
-          b                <- chromote::ChromoteSession$new()
-          userAgent_mobile <- " Chrome/55.0.2883.87 Safari/537.36"
-          b$Network$setUserAgentOverride(userAgent = userAgent_mobile)
-        {
-          b$Page$navigate(glue::glue("https://twitter.com/search?q={q.parse}&src=typed_query&f=live"));
-          b$Page$loadEventFired(wait_ = T)
-        }
-          
-          cookies_ <- b$Network$getCookies()
-          cookies_ <- cookies_$cookies
-        }
-      )
+      b                <- chromote::ChromoteSession$new()
+      userAgent_mobile <- " Chrome/55.0.2883.87 Safari/537.36"
+      b$Network$setUserAgentOverride(userAgent = userAgent_mobile)
+    {
+      b$Page$navigate(glue::glue("https://twitter.com/search?q={q.parse}&src=typed_query&f=live"));
+      b$Page$loadEventFired(wait_ = TRUE)
+    }
+      
+      cookies_ <- b$Network$getCookies()
+      cookies_ <- cookies_$cookies
     }
   )
   
   #b$close()
-  b$.__enclos_env__$self$close()
+  b$close()
   rm(b)
   
   nm       <- unlist(lapply(cookies_, '[[', 1))
