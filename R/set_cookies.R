@@ -16,8 +16,7 @@ set_cookies <- function(q) {
   },
     error   = function(e) {
       devtools::unload('chromote')
-      require(chromote)
-      
+      require(chromote, quietly=T)
     },
     finally = {
       b <- chromote::ChromoteSession$new()
