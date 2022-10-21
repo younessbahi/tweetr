@@ -150,6 +150,9 @@ get_tweets <-
       users.list %<>% select(- entities)
     }
     
+    
+    
+    
     return(
       list(
         tweets_count       = nrow(tw.list),
