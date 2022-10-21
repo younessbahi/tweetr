@@ -94,8 +94,6 @@ tw_entity_clean <- function(tweets) {
   
   ## Hashtags ####
   #/ linkage with tweets rowID /
-  
-  
   if (all_na(entities$hashtags)) {
     
     hashtags <- list()
