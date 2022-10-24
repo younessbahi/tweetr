@@ -15,6 +15,3 @@ A dataframe.
 \description{
 Get trends
 }
-\examples{
-get_trends('1')
-}

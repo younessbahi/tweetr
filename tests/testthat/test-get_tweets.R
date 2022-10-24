@@ -1,3 +1,3 @@
 test_that("tweets status:200", {
-  expect_length(get_tweets(query = '#rstats', .count = 20), 4)
+  expect_length(get_tweets(query = '#rstats', .count = 40), 4)
 })

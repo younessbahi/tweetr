@@ -15,6 +15,3 @@ A dataframe.
 \description{
 Get topics and, influence authors scores based on a search term or a hashtag.
 }
-\examples{
-get_score('#Bitcoin')
-}

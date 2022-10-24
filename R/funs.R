@@ -80,6 +80,7 @@ trends_ <- function(id) {
 }
 
 #' Helper function to clean tweets entities.
+#' @importFrom stats na.omit
 #' @rdname get_tweets
 #' @keywords internal
 #' @param tweets Tweets dataframe.
@@ -129,7 +130,7 @@ tw_entity_clean <- function(tweets) {
     tw.urls <- list()
     
   } else {
-  
+    
     tw.urls <-
       entities %>%
         select(name, urls) %>%
@@ -179,41 +180,41 @@ tw_entity_clean <- function(tweets) {
     
     mentions$id_str <- pull(tweets[mentions$rowID, "id_str"])
     mentions$id     <- as.character(mentions$id)
-  
+    
     if (any(names(mentions) == 'indices')) {
       mentions %<>% select(- indices)
     }
-  
+    
     mentions %<>% filter(! is.na(id))
-  
+    
   }
   
   ## MEDIAS ####
   
   if (any(names(entities) == 'media')) {
-  
-  tw.media <-
-    entities %>%
-      select(name, media) %>%
-      rename(rowID = name)
-  
-  tw.media$media <- lapply(tw.media$media, function(e) { if (is_empty(e)) NA else e })
-  
-  tw.media <-
-    unnest(tw.media, cols = 'media')
-  
-  tw.media_ <-
-    tw.media %>%
-      pluck('media') %>%
-      enframe('rowID') %>%
-      mutate(rowID = tw.media$rowID) %>%
-      unnest_wider(value)
-  
-  tw.media_$id_tweet <- pull(tweets[tw.media_$rowID, 'id_str'])
-  tw.media <-
-    tw.media_ %>%
-      select(- c(indices, original_info, sizes)) %>%
-      filter(! is.na(id_str))
+    
+    tw.media <-
+      entities %>%
+        select(name, media) %>%
+        rename(rowID = name)
+    
+    tw.media$media <- lapply(tw.media$media, function(e) { if (is_empty(e)) NA else e })
+    
+    tw.media <-
+      unnest(tw.media, cols = 'media')
+    
+    tw.media_ <-
+      tw.media %>%
+        pluck('media') %>%
+        enframe('rowID') %>%
+        mutate(rowID = tw.media$rowID) %>%
+        unnest_wider(value)
+    
+    tw.media_$id_tweet <- pull(tweets[tw.media_$rowID, 'id_str'])
+    tw.media           <-
+      tw.media_ %>%
+        select(- c(indices, original_info, sizes)) %>%
+        filter(! is.na(id_str))
     
   } else {
     
@@ -237,11 +238,20 @@ tw_entity_clean <- function(tweets) {
         unnest_wider(value) %>%
         pluck('coordinates') %>%
         enframe() %>%
-        unnest_wider(value) %>%
+        unnest_wider(value)
+    
+    if (length(tw.geo) == 1) {
+      
+      tw.geo <- list()
+      
+    } else {
+      
+      tw.geo %<>%
         set_colnames(c('name', 'lat', 'long')) %>%
         na.omit()
-    
-    tw.geo$id_str <- pull(tweets[tw.geo$name, 'id_str'])
+      
+      tw.geo$id_str <- pull(tweets[tw.geo$name, 'id_str'])
+    }
   }
   
   return(

@@ -4,6 +4,7 @@
 #' @importFrom purrr map_depth pluck is_empty
 #' @importFrom tibble enframe
 #' @import chromote
+#' @importFrom stringr str_trim str_replace_all
 #' @importFrom tidyr unnest_wider
 #' @importFrom na.tools all_na
 #' @importFrom dplyr relocate select arrange mutate rename pull filter
@@ -31,8 +32,7 @@
 #' @param .hasLinks If true, Only tweets with links should be filtered.
 #' @param .url 	Get tweets that only contain links to specific domain names (ex: Oscars.org); Alternatively, you may type in "oscars" to get all tweets with urls that mention the Oscars term.
 #' @return A list.
-#' @examples
-#' get_tweets(query = '#Bitcoin', .since = '2022-10-15', .until = '2022-10-17', .count = 1000)
+#'
 #' @export
 
 get_tweets <-

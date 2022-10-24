@@ -13,8 +13,6 @@
 #' @importFrom glue glue
 #' @import chromote
 #'
-#' @examples
-#' get_score('#Bitcoin')
 #' @export
 
 get_score <- function(keyword) {

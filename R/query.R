@@ -90,7 +90,7 @@ query <- function(query, .lat, .long, .radius, .place, .since, .until, .from, .t
   url  = if (is.na(url_)) '' else paste0('url:', url_)
   
   q       = paste(sTerm, from, to, until, since, place, geo, minLikes, minReplies, minRetweets, verified, hasImage, hasVideo, hasMedia, hasLinks, url)
-  q.clean = stringr::str_replace_all(q, "\\s{2,}", " ") %>% stringr::str_trim("both")
+  q.clean = str_replace_all(q, "\\s{2,}", " ") %>% str_trim("both")
   
   return(q.clean)
   

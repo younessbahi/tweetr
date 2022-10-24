@@ -74,6 +74,3 @@ A list.
 \description{
 Get tweets data from custom search
 }
-\examples{
-get_tweets(query = '#Bitcoin', .since = '2022-10-15', .until = '2022-10-17', .count = 1000)
-}

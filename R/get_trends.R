@@ -10,8 +10,6 @@
 #'
 #' @param id Location id, Default to 1 **worldwide**. Get list of available locations from `data('locID', package = 'tweetr')`.
 #' @return A dataframe.
-#' @examples
-#' get_trends('1')
 #' @export
 
 get_trends <- function(id = '1') {
