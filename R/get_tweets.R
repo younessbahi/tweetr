@@ -12,36 +12,36 @@
 #' @importFrom magrittr %<>% %>% set_colnames
 #'
 #' @param query Can be hashtag, keyword, or a user..
-#' @param .count 	Default to -1, this will collect all tweets related to your search unless you specify a number of tweets to collect. Depending on the tweets volume, the process might take a while.
-#' @param .lat 	Latitude value to provide for geographical search (ex: 33.575692); Latitude, longitude, and radius are each necessary parameters for geographical search.
-#' @param .long Longitude value to provide for geographical search (ex: -7.625285); Latitude, longitude, and radius are each necessary parameters for geographical search.
-#' @param .radius Match Tweets with Tweet-specific location information that are within a sphere-shaped geographic area. (ex: 100km); Latitude, longitude, and radius are each necessary parameters for geographical search.
-#' @param .place Match Tweets Nearby a city or country.
-#' @param .since Filter tweets from a specific date. Allowed date format: `YYYY/MM/DD`
-#' @param .until 	Filter tweets upto a specific date. Allowed date format: `YYYY/MM/DD`
-#' @param .from Collect tweets from a user. (ex: @BillGates)
-#' @param .to Collect tweets mentioning or replying to a specific user. (ex: @BillGates)
-#' @param .replies Set to false by default. if it's true then it will fetch tweets replies only.
-#' @param .minLikes Tweets with at least `(n)` likes should be filtered.
-#' @param .minReplies	Tweets with at least `(n)` replies should be filtered.
-#' @param .minRetweets Tweets with at least `(n)` retweets should be filtered.
-#' @param .verified If true, only tweets from verified accounts will be filtered.
-#' @param .hasImage If true, only tweets with images should be filtered.
-#' @param .hasVideo If true, Only tweets with videos should be filtered.
-#' @param .hasMedia If true, Only tweets with medias should be filtered.
-#' @param .hasLinks If true, Only tweets with links should be filtered.
-#' @param .url 	Get tweets that only contain links to specific domain names (ex: Oscars.org); Alternatively, you may type in "oscars" to get all tweets with urls that mention the Oscars term.
+#' @param count 	Default to -1, this will collect all tweets related to your search unless you specify a number of tweets to collect. Depending on the tweets volume, the process might take a while.
+#' @param lat 	Latitude value to provide for geographical search (ex: 33.575692); Latitude, longitude, and radius are each necessary parameters for geographical search.
+#' @param long Longitude value to provide for geographical search (ex: -7.625285); Latitude, longitude, and radius are each necessary parameters for geographical search.
+#' @param radius Match Tweets with Tweet-specific location information that are within a sphere-shaped geographic area. (ex: 100km); Latitude, longitude, and radius are each necessary parameters for geographical search.
+#' @param place Match Tweets Nearby a city or country.
+#' @param since Filter tweets from a specific date. Allowed date format: `YYYY/MM/DD`
+#' @param until 	Filter tweets upto a specific date. Allowed date format: `YYYY/MM/DD`
+#' @param from Collect tweets from a user. (ex: @BillGates)
+#' @param to Collect tweets mentioning or replying to a specific user. (ex: @BillGates)
+#' @param replies Set to false by default. if it's true then it will fetch tweets replies only.
+#' @param minLikes Tweets with at least `(n)` likes should be filtered.
+#' @param minReplies	Tweets with at least `(n)` replies should be filtered.
+#' @param minRetweets Tweets with at least `(n)` retweets should be filtered.
+#' @param verified If true, only tweets from verified accounts will be filtered.
+#' @param hasImage If true, only tweets with images should be filtered.
+#' @param hasVideo If true, Only tweets with videos should be filtered.
+#' @param hasMedia If true, Only tweets with medias should be filtered.
+#' @param hasLinks If true, Only tweets with links should be filtered.
+#' @param url 	Get tweets that only contain links to specific domain names (ex: Oscars.org); Alternatively, you may type in "oscars" to get all tweets with urls that mention the Oscars term.
 #' @return A list.
 #'
 #' @export
 
 get_tweets <-
-  function(query = NA, .lat = NA, .long = NA, .radius = NA, .place = NA, .since = NA, .until = NA, .from = NA, .to = NA,
-           .replies = F, .minLikes = NA, .minReplies = NA, .minRetweets = NA, .verified = F, .hasImage = F, .hasVideo = F,
-           .hasMedia = F, .hasLinks = F, .url = NA, .count = '-1') {
+  function(query = NA, lat = NA, long = NA, radius = NA, place = NA, since = NA, until = NA, from = NA, to = NA,
+           replies = F, minLikes = NA, minReplies = NA, minRetweets = NA, verified = F, hasImage = F, hasVideo = F,
+           hasMedia = F, hasLinks = F, url = NA, count = '-1') {
     
-    q.clean_ <- tweetr:::query(query, .lat, .long, .radius, .place, .since, .until, .from, .to, .replies, .minLikes,
-                               .minReplies, .minRetweets, .verified, .hasImage, .hasVideo, .hasMedia, .hasLinks, .url)
+    q.clean_ <- tweetr:::query(query, lat, long, radius, place, since, until, from, to, replies, minLikes,
+                               minReplies, minRetweets, verified, hasImage, hasVideo, hasMedia, hasLinks, url)
     
     #colRm <- load('data/colRm.rda')
     
@@ -87,7 +87,7 @@ get_tweets <-
       `ext`                                  = 'mediaStats,highlightedLabel,hasNftAvatar,voiceInfo,enrichments,superFollowMetadata,unmentionInfo,editControl,collab_control,vibe'
     )
     
-    res <- tweetr:::tw_scrape(count = .count, header, cookies, params)
+    res <- tweetr:::tw_scrape(count = count, header, cookies, params)
     
     res.tidy <-
       res %>%

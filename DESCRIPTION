@@ -1,16 +1,17 @@
 Package: tweetr
 Type: Package
-Title: Twitter scraping tool.
+Title: Twitter Scraping Tool
 Version: 1.0
 Date: 2022-10-17
-Author: Youness Bahi
-Maintainer: Youness Bahi <DAyounessbahi@gmail.com>
-Description: Twitter scraping package that enables the collection of Tweets and other data without using the Twitter's API.
+Authors@R: person("Youness", "Bahi", email = "DAyounessbahi@gmail.com",
+    role = c("aut", "cre"))
+Description: Twitter scraping package that enables the collection of
+    Tweets and other data without using the Twitter's API.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1.9001
+RoxygenNote: 7.2.1
 Imports:
     chromote (>= 0.1.1),
     devtools,
@@ -25,9 +26,6 @@ Imports:
     tibble,
     tidyr,
     urltools
-Suggests:
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
 Remotes:
     github::rstudio/chromote
 Depends:

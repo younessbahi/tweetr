@@ -1,6 +1,3 @@
-#' @rdname get_tweets
-#' @rdname get_trends
-#' @rdname get_score
 #' @keywords internal
 #' @noRd
 
