@@ -1,2 +1,5 @@
 .idea
 .Rprofile
+inst/doc
+/doc/
+/Meta/

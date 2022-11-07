@@ -1,5 +1,8 @@
 
 # Tweetr <a href='https://github.com/younessbahi/tweetr/blob/main/'><img src='man/figures/logo.png' align="right" height="139" /></a>
+[![R-CMD-check](https://github.com/younessbahi/tweetr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/younessbahi/tweetr/actions/workflows/R-CMD-check.yaml)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+
 A Twitter scraping package that enables the collection of Tweets and other data without using the Twitter's API.
 
 ### Some of the benefits from using the tweetr package:

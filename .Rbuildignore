@@ -1,3 +1,5 @@
 ^data-raw$
 ^LICENSE\.md$
 .idea
+^doc$
+^Meta$
