@@ -1,24 +1,29 @@
+#' @importFrom crayon blue white bold
 #' @keywords internal
 #' @noRd
 tw_scrape <- function(count, header, cookies, params) {
   empty  = list()
   result = list()
   
-  last.cursor = ''
-  cursor      = '-1'
-  i           = 0
+  last.cursor     = ''
+  cursor          = '-1'
+  i               = 0
+  iter.count      = 0
+  count_          = as.numeric(count)
+  #pagination      = ifelse(count != '-1', ceiling(count_ / 20), '')
   
-  count_     = as.numeric(count)
-  pagination = ifelse(count != '-1', ceiling(count_ / 20), '')
+  
   
   if (count != '-1') {
-    for (c in seq_along(1:pagination)) {
+    pb <- txtProgressBar(0, count_, style = 3, char = '—')
+   # for (c in seq_along(1:pagination)) {
+    while (iter.count < count_) {
       i = i + 1
       
       if (i != 1) {
-        last.cursor        = cursor
+        last.cursor = cursor
+        if (length(last.cursor) == 0) stop('Internet disconnected')
         params[['cursor']] = cursor
-        #cat(cursor, fill = T)
       }
       
       res <-
@@ -29,7 +34,10 @@ tw_scrape <- function(count, header, cookies, params) {
           httr::set_cookies(.cookies = cookies)
         )
       
-      res_ <- content(res)
+      res_       <- content(res)
+      iter.count <- sum(lengths(res_$globalObjects$tweets, use.names = F) != 0) + iter.count
+      if (iter.count > count_) iter.count <- count_
+      setTxtProgressBar(pb, iter.count);close(pb)
       
       if (i != 1) {
         
@@ -71,7 +79,9 @@ tw_scrape <- function(count, header, cookies, params) {
       }
       
       result[[i]] <- append(res_, empty)
+      
     }
+    
   } else {
     
     while (cursor != last.cursor) {
@@ -81,7 +91,7 @@ tw_scrape <- function(count, header, cookies, params) {
       if (i != 1) {
         last.cursor        = cursor
         params[['cursor']] = cursor
-        #cat(cursor, fill = T)
+        
       }
       
       res <-
@@ -93,10 +103,15 @@ tw_scrape <- function(count, header, cookies, params) {
         )
       
       res_ <- content(res)
+      iter.count <- sum(lengths(res_$globalObjects$tweets, use.names = F) != 0) + iter.count
+      Sys.sleep(0.5);
+      cat('\r');
+      cat(crayon::blue('So far'), crayon::bold(crayon::white(iter.count)), crayon::blue('tweet'))
+      
       
       if (i != 1) {
         
-        last   <-
+        last <-
           length(res_$timeline$instructions)
         
         cursor <-
@@ -112,7 +127,7 @@ tw_scrape <- function(count, header, cookies, params) {
         
       } else {
         
-        last   <-
+        last <-
           length(
             res_$
               timeline$

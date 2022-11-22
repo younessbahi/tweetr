@@ -10,6 +10,7 @@
 #' @importFrom dplyr relocate select arrange mutate rename pull filter
 #' @import httr
 #' @importFrom magrittr %<>% %>% set_colnames
+#' @importFrom crayon green bold
 #'
 #' @param query Can be hashtag, keyword, or a user..
 #' @param count 	Default to -1, this will collect all tweets related to your search unless you specify a number of tweets to collect. Depending on the tweets volume, the process might take a while.
@@ -87,6 +88,8 @@ get_tweets <-
       `ext`                                  = 'mediaStats,highlightedLabel,hasNftAvatar,voiceInfo,enrichments,superFollowMetadata,unmentionInfo,editControl,collab_control,vibe'
     )
     
+    cat(crayon::yellow(crayon::bold("Process initiated...\n")))
+    
     res <- tweetr:::tw_scrape(count = count, header, cookies, params)
     
     res.tidy <-
@@ -100,13 +103,13 @@ get_tweets <-
     
     if (all_na(res.tidy$tweets)) {
       
-      tw.list <- list()
-      tw_entity <- list()
+      tw.list            <- list()
+      tw_entity          <- list()
       tw_entity$hashtags <- list()
       tw_entity$mentions <- list()
-      tw_entity$tw.urls <- list()
+      tw_entity$tw.urls  <- list()
       tw_entity$tw.media <- list()
-      tw_entity$geo <- list()
+      tw_entity$geo      <- list()
       
     } else {
       
@@ -123,7 +126,7 @@ get_tweets <-
         select(- c(rowID, created_at, entities, ext, ext_edit_control)) %>%
         arrange(desc(at_GMT_time)) %>%
         relocate(at_GMT_time, at_UTC_time)
-  
+      
       if (any(names(tw.list) == 'display_text_range')) {
         tw.list %<>% select(- display_text_range)
       }
@@ -135,7 +138,7 @@ get_tweets <-
     if (all_na(res.tidy$users)) {
       
       users.list <- list()
-      user.url <- list()
+      user.url   <- list()
       
     } else {
       users.list <-
@@ -150,8 +153,8 @@ get_tweets <-
       users.list %<>% select(- entities)
     }
     
-    
-    
+    cat('\n')
+    cat('🍿', crayon::green('Here we are!'), fill = T)
     
     return(
       list(
