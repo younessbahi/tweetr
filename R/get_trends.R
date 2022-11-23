@@ -14,7 +14,7 @@
 
 get_trends <- function(id = '1') {
   
-  t <- tweetr:::trends_(id)
+  t <- trends_(id)
   trend.df <-
     t[[1]] %>%
       pluck('trends') %>%

@@ -17,7 +17,7 @@
 
 get_score <- function(keyword) {
   
-  ScoreTbl <- tweetr:::score_(keyword)
+  ScoreTbl <- score_(keyword)
 
   if (is_empty(ScoreTbl$topics)) {
     topicScoreTbl <- list()

@@ -42,15 +42,15 @@ get_tweets <-
            replies = F, minLikes = NA, minReplies = NA, minRetweets = NA, verified = F, hasImage = F, hasVideo = F,
            hasMedia = F, hasLinks = F, url = NA, count = '-1') {
     
-    q.clean_ <- tweetr:::query(query, lat, long, radius, lang, place, since, until, from, to, replies, minLikes,
+    q.clean_ <- query(query, lat, long, radius, lang, place, since, until, from, to, replies, minLikes,
                                minReplies, minRetweets, verified, hasImage, hasVideo, hasMedia, hasLinks, url)
     
     #colRm <- load('data/colRm.rda')
     
     q.parse_ = urltools::url_encode(q.clean_)
     
-    cookies <- tweetr:::set_cookies(q = q.parse_)
-    header  <- tweetr:::header_tweets(cookies, q = q.parse_)
+    cookies <- set_cookies(q = q.parse_)
+    header  <- header_tweets(cookies, q = q.parse_)
     
     params <- list(
       `include_profile_interstitial_type`    = '1',
@@ -91,7 +91,7 @@ get_tweets <-
     
     cat(crayon::yellow(crayon::bold("Process initiated...\n")))
     
-    res <- tweetr:::tw_scrape(count = count, header, cookies, params)
+    res <- tw_scrape(count = count, header, cookies, params)
     
     res.tidy <-
       res %>%
@@ -115,13 +115,13 @@ get_tweets <-
     } else {
       
       tw.list <-
-        tweetr:::tidy_(res.tidy$tweets) %>%
+        tidy_(res.tidy$tweets) %>%
           mutate(
-            at_GMT_time = tweetr:::parse_datetime(created_at) + 3600,
-            at_UTC_time = tweetr:::parse_datetime(created_at)
+            at_GMT_time = parse_datetime(created_at) + 3600,
+            at_UTC_time = parse_datetime(created_at)
           )
       
-      tw_entity <- suppressMessages(tweetr:::tw_entity_clean(tweets = tw.list))
+      tw_entity <- suppressMessages(tw_entity_clean(tweets = tw.list))
       
       tw.list %<>%
         select(- c(rowID, created_at, entities, ext, ext_edit_control)) %>%
@@ -143,19 +143,19 @@ get_tweets <-
       
     } else {
       users.list <-
-        tweetr:::tidy_(res.tidy$users) %>%
+        tidy_(res.tidy$users) %>%
           mutate(
-            created_at = tweetr:::parse_datetime(created_at) + 3600
+            created_at = parse_datetime(created_at) + 3600
           )
       
       index_rm <- cRm[which(cRm$to_rm %in% names(users.list)),]$to_rm
       users.list %<>% select(- all_of(index_rm))
-      user.url <- suppressMessages(tweetr:::usr_entity_clean(users = users.list))
+      user.url <- suppressMessages(usr_entity_clean(users = users.list))
       users.list %<>% select(- entities)
     }
     
     cat('\n')
-    cat('🍿', crayon::green(crayon::bold('Successful')), fill = T)
+    cat(crayon::green(crayon::bold('[Successful]')), fill = T)
     
     return(
       list(

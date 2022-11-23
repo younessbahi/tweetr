@@ -27,8 +27,8 @@ score_ <- function(keyword) {
   
   q <- 'science'
   
-  cookies <- tweetr:::set_cookies(q = q)
-  header  <- tweetr:::header_score(data = cookies, q = q)
+  cookies <- set_cookies(q = q)
+  header  <- header_score(data = cookies, q = q)
   
   params <-
     list(
@@ -56,8 +56,8 @@ score_ <- function(keyword) {
 trends_ <- function(id) {
   
   keyword <- 'science'
-  cookies <- tweetr:::set_cookies(q = keyword)
-  header  <- tweetr:::header_trends(cookies, q = keyword)
+  cookies <- set_cookies(q = keyword)
+  header  <- header_trends(cookies, q = keyword)
   
   params = list(
     `id` = id #get place id from locID.rds

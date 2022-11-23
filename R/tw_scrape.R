@@ -1,4 +1,5 @@
 #' @importFrom crayon blue white bold
+#' @importFrom utils txtProgressBar setTxtProgressBar
 #' @keywords internal
 #' @noRd
 tw_scrape <- function(count, header, cookies, params) {
@@ -15,7 +16,7 @@ tw_scrape <- function(count, header, cookies, params) {
   
   
   if (count != '-1') {
-    pb <- txtProgressBar(0, count_, style = 3, char = '—')
+    pb <- utils::txtProgressBar(0, count_, style = 3, char = '-')
    # for (c in seq_along(1:pagination)) {
     while (iter.count < count_) {
       i = i + 1
@@ -37,7 +38,7 @@ tw_scrape <- function(count, header, cookies, params) {
       res_       <- content(res)
       iter.count <- sum(lengths(res_$globalObjects$tweets, use.names = F) != 0) + iter.count
       if (iter.count > count_) iter.count <- count_
-      setTxtProgressBar(pb, iter.count);close(pb)
+      utils::setTxtProgressBar(pb, iter.count);close(pb)
       
       if (i != 1) {
         

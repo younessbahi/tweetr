@@ -26,7 +26,8 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    urltools
+    urltools,
+    utils
 Remotes:
     github::rstudio/chromote
 Depends:
