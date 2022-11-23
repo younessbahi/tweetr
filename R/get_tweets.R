@@ -10,18 +10,19 @@
 #' @importFrom dplyr relocate select arrange mutate rename pull filter
 #' @import httr
 #' @importFrom magrittr %<>% %>% set_colnames
-#' @importFrom crayon green bold
+#' @importFrom crayon green bold yellow
 #'
 #' @param query Can be hashtag, keyword, or a user..
-#' @param count 	Default to -1, this will collect all tweets related to your search unless you specify a number of tweets to collect. Depending on the tweets volume, the process might take a while.
-#' @param lat 	Latitude value to provide for geographical search (ex: 33.575692); Latitude, longitude, and radius are each necessary parameters for geographical search.
-#' @param long Longitude value to provide for geographical search (ex: -7.625285); Latitude, longitude, and radius are each necessary parameters for geographical search.
-#' @param radius Match Tweets with Tweet-specific location information that are within a sphere-shaped geographic area. (ex: 100km); Latitude, longitude, and radius are each necessary parameters for geographical search.
-#' @param place Match Tweets Nearby a city or country.
+#' @param count 	Default to `-1`, this will collect all tweets related to your search unless you specify a number of tweets to collect. Depending on the tweets volume, the process might take a while.
+#' @param lat 	Latitude value to provide for geographical search (ex: `33.575692`); Latitude, longitude, and radius are each necessary parameters for geographical search.
+#' @param long Longitude value to provide for geographical search (ex: `-7.625285`); Latitude, longitude, and radius are each necessary parameters for geographical search.
+#' @param radius Match tweets with tweet-specific location information that are within a sphere-shaped geographic area. (ex: 100km); Latitude, longitude, and radius are each necessary parameters for geographical search.
+#' @param place Match tweets nearby a city or country.
+#' @param lang Filter tweets by language (ex: 'en'). Default to `NULL`
 #' @param since Filter tweets from a specific date. Allowed date format: `YYYY/MM/DD`
 #' @param until 	Filter tweets upto a specific date. Allowed date format: `YYYY/MM/DD`
-#' @param from Collect tweets from a user. (ex: @BillGates)
-#' @param to Collect tweets mentioning or replying to a specific user. (ex: @BillGates)
+#' @param from Collect tweets from a user. (ex: `@BillGates`)
+#' @param to Collect tweets mentioning or replying to a specific user. (ex: `@BillGates`)
 #' @param replies Set to false by default. if it's true then it will fetch tweets replies only.
 #' @param minLikes Tweets with at least `(n)` likes should be filtered.
 #' @param minReplies	Tweets with at least `(n)` replies should be filtered.
@@ -37,11 +38,11 @@
 #' @export
 
 get_tweets <-
-  function(query = NA, lat = NA, long = NA, radius = NA, place = NA, since = NA, until = NA, from = NA, to = NA,
+  function(query = NA, lat = NA, long = NA, radius = NA, place = NA, lang = NULL, since = NA, until = NA, from = NA, to = NA,
            replies = F, minLikes = NA, minReplies = NA, minRetweets = NA, verified = F, hasImage = F, hasVideo = F,
            hasMedia = F, hasLinks = F, url = NA, count = '-1') {
     
-    q.clean_ <- tweetr:::query(query, lat, long, radius, place, since, until, from, to, replies, minLikes,
+    q.clean_ <- tweetr:::query(query, lat, long, radius, lang, place, since, until, from, to, replies, minLikes,
                                minReplies, minRetweets, verified, hasImage, hasVideo, hasMedia, hasLinks, url)
     
     #colRm <- load('data/colRm.rda')
@@ -154,7 +155,7 @@ get_tweets <-
     }
     
     cat('\n')
-    cat('🍿', crayon::green('Here we are!'), fill = T)
+    cat('🍿', crayon::green(crayon::bold('Successful')), fill = T)
     
     return(
       list(

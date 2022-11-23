@@ -10,6 +10,7 @@ get_tweets(
   long = NA,
   radius = NA,
   place = NA,
+  lang = NULL,
   since = NA,
   until = NA,
   from = NA,
@@ -30,21 +31,23 @@ get_tweets(
 \arguments{
 \item{query}{Can be hashtag, keyword, or a user..}
 
-\item{lat}{Latitude value to provide for geographical search (ex: 33.575692); Latitude, longitude, and radius are each necessary parameters for geographical search.}
+\item{lat}{Latitude value to provide for geographical search (ex: \code{33.575692}); Latitude, longitude, and radius are each necessary parameters for geographical search.}
 
-\item{long}{Longitude value to provide for geographical search (ex: -7.625285); Latitude, longitude, and radius are each necessary parameters for geographical search.}
+\item{long}{Longitude value to provide for geographical search (ex: \code{-7.625285}); Latitude, longitude, and radius are each necessary parameters for geographical search.}
 
-\item{radius}{Match Tweets with Tweet-specific location information that are within a sphere-shaped geographic area. (ex: 100km); Latitude, longitude, and radius are each necessary parameters for geographical search.}
+\item{radius}{Match tweets with tweet-specific location information that are within a sphere-shaped geographic area. (ex: 100km); Latitude, longitude, and radius are each necessary parameters for geographical search.}
 
-\item{place}{Match Tweets Nearby a city or country.}
+\item{place}{Match tweets nearby a city or country.}
+
+\item{lang}{Filter tweets by language (ex: 'en'). Default to \code{NULL}}
 
 \item{since}{Filter tweets from a specific date. Allowed date format: \code{YYYY/MM/DD}}
 
 \item{until}{Filter tweets upto a specific date. Allowed date format: \code{YYYY/MM/DD}}
 
-\item{from}{Collect tweets from a user. (ex: @BillGates)}
+\item{from}{Collect tweets from a user. (ex: \verb{@BillGates})}
 
-\item{to}{Collect tweets mentioning or replying to a specific user. (ex: @BillGates)}
+\item{to}{Collect tweets mentioning or replying to a specific user. (ex: \verb{@BillGates})}
 
 \item{replies}{Set to false by default. if it's true then it will fetch tweets replies only.}
 
@@ -66,7 +69,7 @@ get_tweets(
 
 \item{url}{Get tweets that only contain links to specific domain names (ex: Oscars.org); Alternatively, you may type in "oscars" to get all tweets with urls that mention the Oscars term.}
 
-\item{count}{Default to -1, this will collect all tweets related to your search unless you specify a number of tweets to collect. Depending on the tweets volume, the process might take a while.}
+\item{count}{Default to \code{-1}, this will collect all tweets related to your search unless you specify a number of tweets to collect. Depending on the tweets volume, the process might take a while.}
 }
 \value{
 A list.
