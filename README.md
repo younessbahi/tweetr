@@ -26,21 +26,30 @@ remotes::install_github("younessbahi/tweetr")
 ### Basic usage
 
 ```R
-#search tweets
+#Search tweets
 tw <- 
   tweetr::get_tweets(
     query     = '#Bitcoin',
-    .since    = '2022-10-14', 
-    .until    = '2022-10-16',
-    .count    = 500,
-    .minLikes = 50
+    since    = '2022-10-14', 
+    until    = '2022-10-16',
+    count    = 2000,
+    minLikes = 50,
+    lang = 'en'
   )
 
-#influence score of a term or a hashtag
+#Influence score of a term or a hashtag
 sc <- tweetr::get_score('#Bitcoin')
 
-#trending in London
-tr <- tweetr::get_trends('44418')
+#Trending in London
+location <- tweetr::loc
+
+london_id <- 
+  location %>% 
+    filter(name == 'London') %>%
+    pull(woeid) %>%
+    as.character #must be a string
+
+trend <- tweetr::get_trends(london_id)
 ```
 ### Documentation
 Learn more about Tweetr and follow the instructions from [here](https://younessbahi.github.io/tweetr.docs/).
