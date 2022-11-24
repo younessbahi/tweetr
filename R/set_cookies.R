@@ -1,4 +1,7 @@
 #' @import devtools
+#' @importFrom urltools url_encode
+#' @importFrom glue glue
+#' @import chromote
 #' @keywords internal
 #' @noRd
 
@@ -6,32 +9,26 @@ set_cookies <- function(q) {
   
   q.parse = urltools::url_encode(q)
   
-  #chromote::set_chrome_args(c('--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox'))
+  tryCatch({
+    b                <- chromote::ChromoteSession$new()
+    userAgent_mobile <- " Chrome/55.0.2883.87 Safari/537.36"
+    b$Network$setUserAgentOverride(userAgent = userAgent_mobile)
+  },
+    error = function(e) {
+      stop("Please restart your session and try again!")
+    })
   
-  tryCatch(
-  {
-    chromote::ChromoteSession$new
+  tryCatch({
+    b$Page$navigate(glue::glue("https://twitter.com/search?q={q.parse}&src=typed_query&f=live"));
+    b$Page$loadEventFired(wait_ = TRUE)
   },
     error   = function(e) {
-      stop("Please try again!")
+      stop('INTERNET DISCONNECTED - Please check your internet connection and retry!')
+      b$close()
     },
     finally = {
-      b                <- chromote::ChromoteSession$new()
-      userAgent_mobile <- " Chrome/55.0.2883.87 Safari/537.36"
-      b$Network$setUserAgentOverride(userAgent = userAgent_mobile)
-      tryCatch(
-      {
-        b$Page$navigate(glue::glue("https://twitter.com/search?q={q.parse}&src=typed_query&f=live"));
-        b$Page$loadEventFired(wait_ = TRUE)
-      },
-        error   = function(e) {
-          stop('INTERNET DISCONNECTED - Please check your internet connection and retry!')
-        },
-        finally = {
-          cookies_ <- b$Network$getCookies()
-          cookies_ <- cookies_$cookies
-        }
-      )
+      cookies_ <- b$Network$getCookies()
+      cookies_ <- cookies_$cookies
     }
   )
   
