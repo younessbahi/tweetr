@@ -43,7 +43,7 @@ get_tweets <-
            hasMedia = F, hasLinks = F, url = NA, count = '-1') {
     
     q.clean_ <- query(query, lat, long, radius, lang, place, since, until, from, to, replies, minLikes,
-                               minReplies, minRetweets, verified, hasImage, hasVideo, hasMedia, hasLinks, url)
+                      minReplies, minRetweets, verified, hasImage, hasVideo, hasMedia, hasLinks, url)
     
     #colRm <- load('data/colRm.rda')
     
@@ -92,6 +92,8 @@ get_tweets <-
     cat(crayon::yellow(crayon::bold("Process initiated...\n")))
     
     res <- tw_scrape(count = count, header, cookies, params)
+    
+    cat(crayon::yellow(crayon::bold("Cleaning data...")))
     
     res.tidy <-
       res %>%
@@ -154,7 +156,7 @@ get_tweets <-
       users.list %<>% select(- entities)
     }
     
-    cat('\n')
+    cat('\r');
     cat(crayon::green(crayon::bold('[Successful]')), fill = T)
     
     return(
