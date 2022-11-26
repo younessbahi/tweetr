@@ -23,7 +23,7 @@ set_cookies <- function(q) {
     b$Page$loadEventFired(wait_ = TRUE)
   },
     error   = function(e) {
-      stop('INTERNET DISCONNECTED - Please check your internet connection and retry!')
+      stop('INTERNET INTERRUPTED - Please check your internet connection and retry!')
       b$close()
     },
     finally = {

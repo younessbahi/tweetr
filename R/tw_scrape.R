@@ -41,7 +41,8 @@ tw_scrape <- function(count, header, cookies, params) {
           url   = 'https://twitter.com/i/api/2/search/adaptive.json',
           httr::add_headers(.headers = header),
           query = params,
-          httr::set_cookies(.cookies = cookies)
+          httr::set_cookies(.cookies = cookies),
+          timeout(100)
         )
       
       res_       <- content(res)
@@ -107,7 +108,8 @@ tw_scrape <- function(count, header, cookies, params) {
             url   = 'https://twitter.com/i/api/2/search/adaptive.json',
             httr::add_headers(.headers = header),
             query = params,
-            httr::set_cookies(.cookies = cookies)
+            httr::set_cookies(.cookies = cookies),
+            timeout(100)
           )
         
         res_       <- content(res)
