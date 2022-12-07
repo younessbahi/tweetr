@@ -1,3 +1,6 @@
+#' @importFrom glue glue
+#' @importFrom na.tools all_na
+#' @importFrom stringr str_replace_all str_trim
 #' @keywords internal
 #' @noRd
 
@@ -90,7 +93,7 @@ query <- function(query, lat, long, radius, lang, place, since, until, from, to,
   url_ = if (is.na(url_)) '' else paste0('url:', url_)
   
   q       = paste(sTerm, from_, to_, until_, since_, lan, place_, geo, minLikes_, minReplies_, minRetweets_, replies_, verified_, hasImage_, hasVideo_, hasMedia_, hasLinks_, url_)
-  q.clean = str_replace_all(q, "\\s{2,}", " ") %>% str_trim("both")
+  q.clean = stringr::str_replace_all(q, "\\s{2,}", " ") %>% stringr::str_trim("both")
   
   return(q.clean)
   

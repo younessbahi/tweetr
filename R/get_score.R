@@ -1,8 +1,7 @@
 #' Get topics and, influence authors scores based on a search term or a hashtag.
 #'
 #' @param keyword Your target search-term or hashtag to get the influence score of similar topics and users.
-#' @return A dataframe.
-#' @import httr
+
 #' @importFrom na.tools all_na
 #' @importFrom operator.tools %!in%
 #' @importFrom magrittr %<>% %>%
@@ -13,24 +12,25 @@
 #' @importFrom glue glue
 #' @import chromote
 #'
+#' @return A dataframe.
 #' @export
 
 get_score <- function(keyword) {
   
   ScoreTbl <- score_(keyword)
 
-  if (is_empty(ScoreTbl$topics)) {
+  if (purrr::is_empty(ScoreTbl$topics)) {
     topicScoreTbl <- list()
   } else {
     topicScoreTbl <- # tidy topic table
       ScoreTbl %>%
-        pluck('topics') %>%
-        enframe(name = "rowID") %>%
-        unnest_wider(value) %>%
-        select(- c(tokens, inline))
+        purrr::pluck('topics') %>%
+        tibble::enframe(name = "rowID") %>%
+        tidyr::unnest_wider(value) %>%
+        dplyr::select(- c(tokens, inline))
     
     if (any('result_context' %!in% names(topicScoreTbl))) {
-      topicScoreTbl %<>% mutate(result_context = NA)
+      topicScoreTbl %<>% dplyr::mutate(result_context = NA)
     }
     
     topicScoreTbl$context.type <-
@@ -38,7 +38,7 @@ get_score <- function(keyword) {
         purrr::map_depth(
           topicScoreTbl$result_context, 1, ~ .$types %>% unlist(use.names = F)
         ) %>% #list to vec
-          lapply(., function(e) { if (is_empty(e) | is.null(e)) NA else e }) %>%
+          lapply(., function(e) { if (purrr::is_empty(e) | is.null(e)) NA else e }) %>%
           unlist()
       }
     
@@ -47,7 +47,7 @@ get_score <- function(keyword) {
         purrr::map_depth(
           topicScoreTbl$result_context, 1, ~ .$display_string %>% unlist(use.names = F)
         ) %>% #list to vec
-          lapply(., function(e) { if (is_empty(e) | is.null(e)) NA else e }) %>%
+          lapply(., function(e) { if (purrr::is_empty(e) | is.null(e)) NA else e }) %>%
           unlist()
       }
     
@@ -59,19 +59,19 @@ get_score <- function(keyword) {
 }
   
   
-  if (is_empty(ScoreTbl$users)) {
+  if (purrr::is_empty(ScoreTbl$users)) {
     userScoreTbl <- list()
   } else {
     userScoreTbl <-
       ScoreTbl %>%
-        pluck('users') %>%
-        enframe(name = "rowID") %>%
+        purrr::pluck('users') %>%
+        tibble::enframe(name = "rowID") %>%
         unnest_wider(value)
     
     userScoreTbl$tokens <-
       userScoreTbl %>%
-        pluck('tokens') %>%
-        enframe(name = "rowID") %>%
+        purrr::pluck('tokens') %>%
+        tibble::enframe(name = "rowID") %>%
         unnest(value) %>%
         mutate(value = unlist(value, use.names = F)) %>%
         group_by(rowID) %>%
@@ -87,14 +87,14 @@ get_score <- function(keyword) {
     userScoreTbl$context.type <-
       if (all_na(userScoreTbl$result_context)) '' else {
         purrr::map_depth(userScoreTbl$result_context, .depth = 1, ~ .$types %>% unlist(use.names = F)) %>% #list to vec
-          lapply(., function(e) { if (is_empty(e) | is.null(e)) NA else e }) %>%
+          lapply(., function(e) { if (purrr::is_empty(e) | is.null(e)) NA else e }) %>%
           unlist()
       }
     
     userScoreTbl$context.string <-
       if (all_na(userScoreTbl$result_context)) '' else {
         purrr::map_depth(userScoreTbl$result_context, .depth = 1, ~ .$display_string %>% unlist(use.names = F)) %>% #list to vec
-          lapply(., function(e) { if (is_empty(e) | is.null(e)) NA else e }) %>%
+          lapply(., function(e) { if (purrr::is_empty(e) | is.null(e)) NA else e }) %>%
           unlist()
       }
     

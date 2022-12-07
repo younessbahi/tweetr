@@ -1,5 +1,6 @@
 #' @importFrom crayon blue white bold red yellow
 #' @importFrom utils txtProgressBar setTxtProgressBar
+#' @importFrom httr GET add_headers set_cookies timeout content
 #' @keywords internal
 #' @noRd
 tw_scrape <- function(count, header, cookies, params) {
@@ -18,7 +19,7 @@ tw_scrape <- function(count, header, cookies, params) {
       cat('\r');
       cat(crayon::yellow('Refreshing cookies...'))
       q = params[['q']]
-      cookies <- set_cookies(q = q)
+      cookies <- set_cookies_(q = q)
       header  <- header_tweets(cookies, q = q)
     }
   }
@@ -42,10 +43,10 @@ tw_scrape <- function(count, header, cookies, params) {
           httr::add_headers(.headers = header),
           query = params,
           httr::set_cookies(.cookies = cookies),
-          timeout(100)
+          httr::timeout(100)
         )
       
-      res_       <- content(res)
+      res_       <- httr::content(res)
       iter.count <- sum(lengths(res_$globalObjects$tweets, use.names = F) != 0) + iter.count
       if (iter.count > count_) iter.count <- count_
       utils::setTxtProgressBar(pb, iter.count)
@@ -109,10 +110,10 @@ tw_scrape <- function(count, header, cookies, params) {
             httr::add_headers(.headers = header),
             query = params,
             httr::set_cookies(.cookies = cookies),
-            timeout(100)
+            httr::timeout(100)
           )
         
-        res_       <- content(res)
+        res_       <- httr::content(res)
         iter.count <- sum(lengths(res_$globalObjects$tweets, use.names = F) != 0) + iter.count
         cat('\r');
         cat(crayon::blue('So far'), crayon::bold(crayon::white(iter.count)), crayon::blue('tweet'))

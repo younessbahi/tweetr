@@ -5,14 +5,15 @@
 #' @keywords internal
 #' @noRd
 
-set_cookies <- function(q) {
+set_cookies_ <- function(q) {
   
   q.parse = urltools::url_encode(q)
   
   tryCatch({
     b                <- chromote::ChromoteSession$new()
-    userAgent_mobile <- " Chrome/55.0.2883.87 Safari/537.36"
-    b$Network$setUserAgentOverride(userAgent = userAgent_mobile)
+    #userAgent <- " Chrome/55.0.2883.87 Safari/537.36"
+    userAgent <- readLines('https://raw.githubusercontent.com/younessbahi/agents/main/user-agent.txt')
+    b$Network$setUserAgentOverride(userAgent = sample(userAgent, size = 1, replace = T))
   },
     error = function(e) {
       stop("Please restart your session and try again!")

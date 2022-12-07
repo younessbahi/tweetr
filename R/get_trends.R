@@ -1,12 +1,10 @@
 #' Get trends
 #'
-#' @importFrom purrr pluck is_empty
+#' @importFrom purrr pluck
 #' @importFrom tibble enframe
-#' @import chromote
-#' @importFrom tidyr unnest_wider unnest
-#' @importFrom dplyr relocate select arrange mutate rename pull filter
-#' @import httr
-#' @importFrom magrittr %<>% %>%
+#' @importFrom tidyr unnest_wider
+#' @importFrom dplyr arrange mutate
+#' @importFrom magrittr %>%
 #'
 #' @param id Location id, Default to 1 **worldwide**. Get list of available locations from `data('locID', package = 'tweetr')`.
 #' @return A dataframe.
@@ -17,14 +15,12 @@ get_trends <- function(id = '1') {
   t <- trends_(id)
   trend.df <-
     t[[1]] %>%
-      pluck('trends') %>%
-      enframe(name = "rowID") %>%
-      unnest_wider(value) %>%
-      arrange(desc(tweet_volume)) %>%
-      mutate(time = Sys.time()) # track ranking overtime
+      purrr::pluck('trends') %>%
+      tibble::enframe(name = "rowID") %>%
+      tidyr::unnest_wider(value) %>%
+      dplyr::arrange(desc(tweet_volume)) %>%
+      dplyr::mutate(time = Sys.time()) # track ranking overtime
   
   return(trend.df)
 
 }
-
-#todo: add get_location()

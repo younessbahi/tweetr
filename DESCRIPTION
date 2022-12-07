@@ -32,7 +32,7 @@ Remotes:
     github::rstudio/chromote
 Depends:
     R (>= 3.5.0)
-Suggests: 
+Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr

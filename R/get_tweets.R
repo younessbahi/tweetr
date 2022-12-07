@@ -10,7 +10,7 @@
 #' @importFrom dplyr relocate select arrange mutate rename pull filter
 #' @import httr
 #' @importFrom magrittr %<>% %>% set_colnames
-#' @importFrom crayon green bold yellow
+#' @importFrom crayon green bold yellow red
 #'
 #' @param query Can be hashtag, keyword, or a user..
 #' @param count 	Default to `-1`, this will collect all tweets related to your search unless you specify a number of tweets to collect. Depending on the tweets volume, the process might take a while.
@@ -49,7 +49,7 @@ get_tweets <-
     
     q.parse_ = urltools::url_encode(q.clean_)
     
-    cookies <- set_cookies(q = q.parse_)
+    cookies <- set_cookies_(q = q.parse_)
     header  <- header_tweets(cookies, q = q.parse_)
     
     params <- list(
@@ -92,17 +92,24 @@ get_tweets <-
     cat(crayon::yellow(crayon::bold("Process initiated...\n")))
     
     res <- tw_scrape(count = count, header, cookies, params)
-    
+  
     cat(crayon::yellow(crayon::bold("Cleaning data...")))
     
-    res.tidy <-
-      res %>%
-        pluck() %>%
-        enframe('rowID') %>%
-        unnest_wider(value) %>%
-        select(- timeline) %>%
-        unnest_wider(globalObjects) %>%
-        select(rowID, tweets, users)
+    tryCatch({
+      res.tidy <-
+        res %>%
+          purrr::pluck() %>%
+          tibble::enframe('rowID') %>%
+          tidyr::unnest_wider(value) %>%
+          dplyr::select(- timeline) %>%
+          tidyr::unnest_wider(globalObjects) %>%
+          dplyr::select(rowID, tweets, users)
+    },
+      error = function(e) {
+        cat(crayon::red(crayon::bold("\n[unsuccesfull]")), fill = T)
+        stop(call. = T)
+      }
+    )
     
     if (all_na(res.tidy$tweets)) {
       
@@ -137,7 +144,7 @@ get_tweets <-
         ungroup() %>%
         arrange(desc(at_GMT_time)) %>%
         relocate(at_GMT_time, at_UTC_time)
-        
+      
       
       if (any(names(tw.list) == 'display_text_range')) {
         tw.list %<>% select(- display_text_range)
@@ -166,18 +173,18 @@ get_tweets <-
         select(- entities) %>%
         group_by(id_str) %>%
         mutate(
-          followers_count = max(followers_count),
-          friends_count = max(friends_count),
+          followers_count        = max(followers_count),
+          friends_count          = max(friends_count),
           normal_followers_count = max(normal_followers_count),
-          statuses_count = max(statuses_count),
-          media_count = max(media_count),
-          favourites_count = max(favourites_count)
+          statuses_count         = max(statuses_count),
+          media_count            = max(media_count),
+          favourites_count       = max(favourites_count)
         ) %>%
         ungroup()
     }
     
     cat('\r');
-    cat(crayon::green(crayon::bold('[Successful]')), fill = T)
+    cat(crayon::green(crayon::bold('[successful]')), fill = T)
     
     return(
       list(

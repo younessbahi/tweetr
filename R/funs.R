@@ -1,12 +1,14 @@
 #' Helper function to unnest nested dataframe in list.
+#' @importFrom tibble enframe
+#' @importFrom tidyr unnest_wider
 #' @keywords internal
 #' @param .x A list vector.
 #' @noRd
 
 tidy_ <- function(.x) {
   unlist(.x, recursive = F) %>%
-    enframe('rowID') %>%
-    unnest_wider(value)
+    tibble::enframe('rowID') %>%
+    tidyr::unnest_wider(value)
 }
 
 #' Helper function to format datetime.
@@ -19,6 +21,7 @@ parse_datetime <- function(str_date) {
 }
 
 #' Helper function to scrape search influence scores.
+#' @importFrom httr GET add_headers set_cookies content
 #' @keywords internal
 #' @param keyword A search term or a hashtag.
 #' @noRd
@@ -27,7 +30,7 @@ score_ <- function(keyword) {
   
   q <- 'science'
   
-  cookies <- set_cookies(q = q)
+  cookies <- set_cookies_(q = q)
   header  <- header_score(data = cookies, q = q)
   
   params <-
@@ -49,6 +52,7 @@ score_ <- function(keyword) {
 }
 
 #' Helper function to scrape trend.
+#' @importFrom httr GET add_headers set_cookies content
 #' @keywords internal
 #' @param id Location ID.
 #' @noRd
@@ -56,7 +60,7 @@ score_ <- function(keyword) {
 trends_ <- function(id) {
   
   keyword <- 'science'
-  cookies <- set_cookies(q = keyword)
+  cookies <- set_cookies_(q = keyword)
   header  <- header_trends(cookies, q = keyword)
   
   params = list(
@@ -76,7 +80,13 @@ trends_ <- function(id) {
 }
 
 #' Helper function to clean tweets entities.
+#' @import dplyr
+#' @importFrom magrittr set_colnames %<>%
 #' @importFrom stats na.omit
+#' @importFrom purrr pluck map_depth is_empty
+#' @importFrom tibble enframe
+#' @importFrom tidyr unnest_wider unnest
+#' @importFrom na.tools all_na
 #' @keywords internal
 #' @param tweets Tweets dataframe.
 #' @noRd
@@ -84,15 +94,15 @@ trends_ <- function(id) {
 tw_entity_clean <- function(tweets) {
   entities <-
     tweets %>%
-      pluck('entities') %>%
-      enframe() %>%
-      unnest_wider(value)
+      purrr::pluck('entities') %>%
+      tibble::enframe() %>%
+      tidyr::unnest_wider(value)
   
   ## Hashtags ####
   #/ linkage with tweets rowID /
   
   
-  if (all_na(entities$hashtags)) {
+  if (na.tools::all_na(entities$hashtags)) {
     
     hashtags <- list()
     
@@ -100,27 +110,27 @@ tw_entity_clean <- function(tweets) {
     
     hashtags <-
       entities %>%
-        select(name, hashtags) %>%
-        rename(rowID = name)
+        dplyr::select(name, hashtags) %>%
+        dplyr::rename(rowID = name)
     
-    hashtags$hashtags <- map_depth(hashtags$hashtags, 2, ~ .$text)
+    hashtags$hashtags <- purrr::map_depth(hashtags$hashtags, 2, ~ .$text)
     
     hashtags$hashtags <-
       lapply(
         hashtags$hashtags,
-        function(e) { if (is_empty(e)) NA else e }
+        function(e) { if (purrr::is_empty(e)) NA else e }
       )
     
     hashtags %<>%
-      unnest(cols = hashtags) %>%
-      unnest(cols = hashtags)
+      tidyr::unnest(cols = hashtags) %>%
+      tidyr::unnest(cols = hashtags)
     
-    hashtags$id_str <- pull(tweets[hashtags$rowID, "id_str"])
+    hashtags$id_str <- dplyr::pull(tweets[hashtags$rowID, "id_str"])
   }
   
   ## URLS ####
   
-  if (all_na(entities$urls)) {
+  if (na.tools::all_na(entities$urls)) {
     
     tw.urls <- list()
     
@@ -128,44 +138,44 @@ tw_entity_clean <- function(tweets) {
     
     tw.urls <-
       entities %>%
-        select(name, urls) %>%
-        rename(rowID = name)
+        dplyr::select(name, urls) %>%
+        dplyr::rename(rowID = name)
     
-    tw.urls$urls <- lapply(tw.urls$urls, function(e) { if (is_empty(e)) NA else e })
+    tw.urls$urls <- lapply(tw.urls$urls, function(e) { if (purrr::is_empty(e)) NA else e })
     
     tw.urls <-
       tw.urls %>%
-        unnest(cols = 'urls') %>%
-        unnest_wider('urls')
+        tidyr::unnest(cols = 'urls') %>%
+        tidyr::unnest_wider('urls')
     
-    tw.urls$id_str <- pull(tweets[tw.urls$rowID, "id_str"])
+    tw.urls$id_str <- dplyr::pull(tweets[tw.urls$rowID, "id_str"])
     
     if (any(names(tw.urls) == 'indices')) {
       tw.urls %<>% select(- indices)
     }
     
-    tw.urls %<>% filter(! is.na(expanded_url))
+    tw.urls %<>% dplyr::filter(! is.na(expanded_url))
   }
   
   ## Mentions ####
   #/ linkage with tweets rowID /
   mentions <-
     entities %>%
-      select(name, user_mentions)
+      dplyr::select(name, user_mentions)
   
   mentions$user_mentions <-
     lapply(
       mentions$user_mentions,
-      function(e) { if (is_empty(e)) NA else e }
+      function(e) { if (purrr::is_empty(e)) NA else e }
     )
   
   mentions %<>%
-    unnest(user_mentions)
+    tidyr::unnest(user_mentions)
   
-  mentions %<>% pluck('user_mentions') %>%
-    enframe(name = 'rowID') %>%
-    mutate(rowID = mentions$name) %>%
-    unnest_wider(value)
+  mentions %<>% purrr::pluck('user_mentions') %>%
+    tibble::enframe(name = 'rowID') %>%
+    dplyr::mutate(rowID = mentions$name) %>%
+    tidyr::unnest_wider(value)
   
   if (length(mentions) < 6) {
     
@@ -173,14 +183,14 @@ tw_entity_clean <- function(tweets) {
     
   } else {
     
-    mentions$id_str <- pull(tweets[mentions$rowID, "id_str"])
+    mentions$id_str <- dplyr::pull(tweets[mentions$rowID, "id_str"])
     mentions$id     <- as.character(mentions$id)
     
     if (any(names(mentions) == 'indices')) {
-      mentions %<>% select(- indices)
+      mentions %<>% dplyr::select(- indices)
     }
     
-    mentions %<>% filter(! is.na(id))
+    mentions %<>% dplyr::filter(! is.na(id))
     
   }
   
@@ -190,26 +200,26 @@ tw_entity_clean <- function(tweets) {
     
     tw.media <-
       entities %>%
-        select(name, media) %>%
-        rename(rowID = name)
+        dplyr::select(name, media) %>%
+        dplyr::rename(rowID = name)
     
-    tw.media$media <- lapply(tw.media$media, function(e) { if (is_empty(e)) NA else e })
+    tw.media$media <- lapply(tw.media$media, function(e) { if (purrr::is_empty(e)) NA else e })
     
     tw.media <-
-      unnest(tw.media, cols = 'media')
+      tidyr::unnest(tw.media, cols = 'media')
     
     tw.media_ <-
       tw.media %>%
-        pluck('media') %>%
-        enframe('rowID') %>%
-        mutate(rowID = tw.media$rowID) %>%
-        unnest_wider(value)
+        purrr::pluck('media') %>%
+        tibble::enframe('rowID') %>%
+        dplyr::mutate(rowID = tw.media$rowID) %>%
+        tidyr::unnest_wider(value)
     
     tw.media_$id_tweet <- pull(tweets[tw.media_$rowID, 'id_str'])
     tw.media           <-
       tw.media_ %>%
-        select(- c(indices, original_info, sizes)) %>%
-        filter(! is.na(id_str))
+        dplyr::select(- c(indices, original_info, sizes)) %>%
+        dplyr::filter(! is.na(id_str))
     
   } else {
     
@@ -226,14 +236,14 @@ tw_entity_clean <- function(tweets) {
     
     tw.geo <-
       tweets %>%
-        select(id_str, user_id_str, geo) %>%
-        pluck('geo') %>%
-        enframe() %>%
-        filter(! is.na(value)) %>%
-        unnest_wider(value) %>%
-        pluck('coordinates') %>%
-        enframe() %>%
-        unnest_wider(value)
+        dplyr::select(id_str, user_id_str, geo) %>%
+        purrr::pluck('geo') %>%
+        tibble::enframe() %>%
+        dplyr::filter(! is.na(value)) %>%
+        tidyr::unnest_wider(value) %>%
+        purrr::pluck('coordinates') %>%
+        tibble::enframe() %>%
+        tidyr::unnest_wider(value)
     
     if (length(tw.geo) == 1) {
       
@@ -242,10 +252,10 @@ tw_entity_clean <- function(tweets) {
     } else {
       
       tw.geo %<>%
-        set_colnames(c('name', 'lat', 'long')) %>%
+        magrittr::set_colnames(c('name', 'lat', 'long')) %>%
         na.omit()
       
-      tw.geo$id_str <- pull(tweets[tw.geo$name, 'id_str'])
+      tw.geo$id_str <- dplyr::pull(tweets[tw.geo$name, 'id_str'])
     }
   }
   
@@ -262,6 +272,10 @@ tw_entity_clean <- function(tweets) {
 }
 
 #' Helper function to clean user entity.
+#' @import dplyr
+#' @importFrom tidyr unnest_wider unnest
+#' @importFrom tibble enframe
+#' @importFrom purrr pluck
 #' @keywords internal
 #' @param users Users dataframe
 #' @noRd
@@ -270,37 +284,37 @@ usr_entity_clean <- function(users) {
   
   entities_usr <-
     users %>%
-      pluck('entities') %>%
-      enframe() %>%
-      unnest_wider(value)
+      purrr::pluck('entities') %>%
+      tibble::enframe() %>%
+      tidyr::unnest_wider(value)
   
   if (any(names(entities_usr) == 'url')) {
     
     user.url_ <-
       entities_usr %>%
-        select(name, url) %>%
-        rename(rowID = name)
+        dplyr::select(name, url) %>%
+        dplyr::rename(rowID = name)
     
     user.url <-
       user.url_ %>%
-        pluck('url') %>%
-        enframe('rowID')
+        purrr::pluck('url') %>%
+        tibble::enframe('rowID')
     
-    user.url$value <- lapply(user.url$value, function(e) { if (is_empty(e)) NA else e })
+    user.url$value <- lapply(user.url$value, function(e) { if (purrr::is_empty(e)) NA else e })
     user.url %<>%
-      unnest(value) %>%
-      pluck('value') %>%
-      enframe('rowID')
+      tidyr::unnest(value) %>%
+      purrr::pluck('value') %>%
+      tibble::enframe('rowID')
     
-    user.url$value <- lapply(user.url$value, function(e) { if (is_empty(e)) NA else e })
+    user.url$value <- lapply(user.url$value, function(e) { if (purrr::is_empty(e)) NA else e })
     user.url %<>%
-      unnest(value) %>%
-      unnest_wider(value) %>%
-      mutate(
+      tidyr::unnest(value) %>%
+      tidyr::unnest_wider(value) %>%
+      dplyr::mutate(
         rowID      = user.url_$rowID,
-        usr_id_str = pull(users[rowID, "id_str"])
+        usr_id_str = dplyr::pull(users[rowID, "id_str"])
       ) %>%
-      select(- c(indices, rowID))
+      dplyr::select(- c(indices, rowID))
     
   } else {
     
