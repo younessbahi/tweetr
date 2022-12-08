@@ -15,15 +15,15 @@ get_tweets(
   until = NA,
   from = NA,
   to = NA,
-  replies = F,
+  replies = "none",
   minLikes = NA,
   minReplies = NA,
   minRetweets = NA,
-  verified = F,
-  hasImage = F,
-  hasVideo = F,
-  hasMedia = F,
-  hasLinks = F,
+  verified = "none",
+  hasImage = "none",
+  hasVideo = "none",
+  hasMedia = "none",
+  hasLinks = "none",
   url = NA,
   count = "-1"
 )
@@ -49,7 +49,7 @@ get_tweets(
 
 \item{to}{Collect tweets mentioning or replying to a specific user. (ex: \verb{@BillGates})}
 
-\item{replies}{Set to false by default. if it's true then it will fetch tweets replies only.}
+\item{replies}{If TRUE, Only replies should be filtered. If set to FALSE, replies will be excluded from the search result.}
 
 \item{minLikes}{Tweets with at least \code{(n)} likes should be filtered.}
 
@@ -57,15 +57,15 @@ get_tweets(
 
 \item{minRetweets}{Tweets with at least \code{(n)} retweets should be filtered.}
 
-\item{verified}{If true, only tweets from verified accounts will be filtered.}
+\item{verified}{If TRUE, only tweets from verified accounts will be filtered. If set to FALSE, the verified account will be excluded from the result.}
 
-\item{hasImage}{If true, only tweets with images should be filtered.}
+\item{hasImage}{If TRUE, only tweets with images should be filtered. If set to FALSE, tweets with images will be excluded from the search result.}
 
-\item{hasVideo}{If true, Only tweets with videos should be filtered.}
+\item{hasVideo}{If TRUE, Only tweets with videos should be filtered. If set to FALSE, tweets with videos will be excluded from the search result.}
 
-\item{hasMedia}{If true, Only tweets with medias should be filtered.}
+\item{hasMedia}{If TRUE, Only tweets with medias should be filtered. If set to FALSE, tweets with medias will be excluded from the search result.}
 
-\item{hasLinks}{If true, Only tweets with links should be filtered.}
+\item{hasLinks}{If TRUE, Only tweets with links should be filtered. If set to FALSE, tweets with links will be excluded from the search result.}
 
 \item{url}{Get tweets that only contain links to specific domain names (ex: Oscars.org); Alternatively, you may type in "oscars" to get all tweets with urls that mention the Oscars term.}
 

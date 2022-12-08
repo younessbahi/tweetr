@@ -23,15 +23,15 @@
 #' @param until 	Filter tweets upto a specific date. Allowed date format: `YYYY/MM/DD`
 #' @param from Collect tweets from a user. (ex: `@BillGates`)
 #' @param to Collect tweets mentioning or replying to a specific user. (ex: `@BillGates`)
-#' @param replies Set to false by default. if it's true then it will fetch tweets replies only.
 #' @param minLikes Tweets with at least `(n)` likes should be filtered.
 #' @param minReplies	Tweets with at least `(n)` replies should be filtered.
 #' @param minRetweets Tweets with at least `(n)` retweets should be filtered.
-#' @param verified If true, only tweets from verified accounts will be filtered.
-#' @param hasImage If true, only tweets with images should be filtered.
-#' @param hasVideo If true, Only tweets with videos should be filtered.
-#' @param hasMedia If true, Only tweets with medias should be filtered.
-#' @param hasLinks If true, Only tweets with links should be filtered.
+#' @param replies If TRUE, Only replies should be filtered. If set to FALSE, replies will be excluded from the search result.
+#' @param verified If TRUE, only tweets from verified accounts will be filtered. If set to FALSE, the verified account will be excluded from the result.
+#' @param hasImage If TRUE, only tweets with images should be filtered. If set to FALSE, tweets with images will be excluded from the search result.
+#' @param hasVideo If TRUE, Only tweets with videos should be filtered. If set to FALSE, tweets with videos will be excluded from the search result.
+#' @param hasMedia If TRUE, Only tweets with medias should be filtered. If set to FALSE, tweets with medias will be excluded from the search result.
+#' @param hasLinks If TRUE, Only tweets with links should be filtered. If set to FALSE, tweets with links will be excluded from the search result.
 #' @param url 	Get tweets that only contain links to specific domain names (ex: Oscars.org); Alternatively, you may type in "oscars" to get all tweets with urls that mention the Oscars term.
 #' @return A list.
 #'
@@ -39,8 +39,8 @@
 
 get_tweets <-
   function(query = NA, lat = NA, long = NA, radius = NA, place = NA, lang = NULL, since = NA, until = NA, from = NA, to = NA,
-           replies = F, minLikes = NA, minReplies = NA, minRetweets = NA, verified = F, hasImage = F, hasVideo = F,
-           hasMedia = F, hasLinks = F, url = NA, count = '-1') {
+           replies = 'none', minLikes = NA, minReplies = NA, minRetweets = NA, verified = 'none', hasImage = 'none', hasVideo = 'none',
+           hasMedia = 'none', hasLinks = 'none', url = NA, count = '-1') {
     
     q.clean_ <- query(query, lat, long, radius, lang, place, since, until, from, to, replies, minLikes,
                       minReplies, minRetweets, verified, hasImage, hasVideo, hasMedia, hasLinks, url)
@@ -59,7 +59,7 @@ get_tweets <-
       `include_followed_by`                  = '1',
       #`include_want_retweets`               = '1',
       #`include_mute_edge` = '1',
-      #`include_can_dm`                      = '1',
+      `include_can_dm`                       = '1',
       `include_can_media_tag`                = '1',
       `include_ext_has_nft_avatar`           = '1',
       #`skip_status`                         = '1',
@@ -86,14 +86,19 @@ get_tweets <-
       `pc`                                   = '1',
       `spelling_corrections`                 = '1',
       `include_ext_edit_control`             = 'true',
+      `include_rts` = 'false',
       `ext`                                  = 'mediaStats,highlightedLabel,hasNftAvatar,voiceInfo,enrichments,superFollowMetadata,unmentionInfo,editControl,collab_control,vibe'
     )
     
     cat(crayon::yellow(crayon::bold("Process initiated...\n")))
     
     res <- tw_scrape(count = count, header, cookies, params)
-  
+
+  if (count != '-1') {
     cat(crayon::yellow(crayon::bold("Cleaning data...")))
+  } else {
+    cat(" | ", crayon::yellow(crayon::bold("Cleaning data...")))
+  }
     
     tryCatch({
       res.tidy <-

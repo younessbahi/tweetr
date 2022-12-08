@@ -9,13 +9,13 @@ query <- function(query, lat, long, radius, lang, place, since, until, from, to,
   
   config <- list()
   
-  sTerm = as.character(query)  #default to NULL
+  sTerm = as.character(query)
   sTerm = if (is.na(sTerm)) '' else sTerm
   
   #Geocode
-  lat_    <- as.character(lat) #"33.575692"
-  long_   <- as.character(long) #"-7.625285"
-  radius_ <- as.character(radius) #"100km"
+  lat_    <- as.character(lat) #ex:"33.575692"
+  long_   <- as.character(long) #ex:"-7.625285"
+  radius_ <- as.character(radius) #ex:"100km"
   
   geo <- c()
   
@@ -55,41 +55,41 @@ query <- function(query, lat, long, radius, lang, place, since, until, from, to,
     since_ <- ''
   }
   
-  from_ = as.character(from) # '@CBCNews' #default NULL
+  from_ = as.character(from)
   from_ = if (is.na(from_)) '' else paste0('from:', from_)
   
-  to_ = as.character(to) # default NULL
+  to_ = as.character(to)
   to_ = if (is.na(to_)) '' else paste0('to:', to_)
   
   # Filters
-  replies_ = as.logical(toupper(replies)) #logical
-  replies_ = if (replies_ == FALSE) '' else { "filter:replies" }
-  
-  minLikes_ = as.character(minLikes) #default NULL
+  minLikes_ = as.character(minLikes)
   minLikes_ = if (is.na(minLikes_)) '' else paste0('min_faves:', minLikes_)
   
-  minReplies_ = as.character(minReplies) #default NULL
+  minReplies_ = as.character(minReplies)
   minReplies_ = if (is.na(minReplies_)) '' else paste0('min_replies:', minReplies_)
   
-  minRetweets_ = as.character(minRetweets) #default NULL
+  minRetweets_ = as.character(minRetweets)
   minRetweets_ = if (is.na(minRetweets_)) '' else paste0('min_retweets:', minRetweets_)
   
-  verified_ = as.logical(toupper(verified)) #logical
-  verified_ = if (verified_ == FALSE) '' else { "filter:verified" }
+  #replies_ = as.logical(toupper(replies))
+  replies_ = if (replies == 'none') '' else if (replies == FALSE) {"-filter:replies"} else { "filter:replies" }
   
-  hasImage_ <- as.logical(toupper(hasImage))  #logical
-  hasImage_ <- if (hasImage_ == FALSE) '' else { "filter:images" }
+  #verified_ = as.logical(toupper(verified))
+  verified_ = if (verified == 'none') ''  else if (verified == FALSE) { "-filter:verified" } else { "filter:verified" }
   
-  hasVideo_ <- as.logical(toupper(hasVideo))  #logical
-  hasVideo_ <- if (hasVideo_ == FALSE) '' else { "filter:videos" }
+  #hasImage_ <- as.logical(toupper(hasImage))
+  hasImage_ <- if (hasImage == 'none') '' else if (hasImage == FALSE) { "-filter:images" } else { "filter:images" }
   
-  hasMedia_ <- as.logical(toupper(hasMedia))  #logical
-  hasMedia_ <- if (hasMedia_ == FALSE) '' else { "filter:media" }
+  #hasVideo_ <- as.logical(toupper(hasVideo))
+  hasVideo_ <- if (hasVideo == 'none') '' else if (hasVideo == FALSE) { "-filter:videos" } else { "filter:videos" }
   
-  hasLinks_ <- as.logical(toupper(hasLinks))  #logical
-  hasLinks_ <- if (hasLinks_ == FALSE) '' else { "filter:links" }
+  #hasMedia_ <- as.logical(toupper(hasMedia))
+  hasMedia_ <- if (hasMedia == 'none') '' else if (hasMedia == FALSE) { "-filter:media" } else { "filter:media" }
   
-  url_ = as.character(url) #default NULL
+  #hasLinks_ <- as.logical(toupper(hasLinks))
+  hasLinks_ <- if (hasLinks == 'none') '' else if (hasLinks == FALSE) { "-filter:links" } else { "filter:links" }
+  
+  url_ = as.character(url)
   url_ = if (is.na(url_)) '' else paste0('url:', url_)
   
   q       = paste(sTerm, from_, to_, until_, since_, lan, place_, geo, minLikes_, minReplies_, minRetweets_, replies_, verified_, hasImage_, hasVideo_, hasMedia_, hasLinks_, url_)
