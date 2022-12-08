@@ -48,6 +48,7 @@ tw <- get_tweets(
 
 #### Search by geolocation
 <a href='https://github.com/younessbahi/tweetr/blob/main/'><img src='man/figures/montreal.jpg' align="center"/></a>
+
 ```R
 tw <- get_tweets(
   lat    = "45.524844", 
