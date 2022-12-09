@@ -29,13 +29,13 @@ remotes::install_github("younessbahi/tweetr")
 #### Search tweets
 ```R
 tw <- tweetr::get_tweets(
-    query    = '#Bitcoin',
-    since    = '2022-10-14',
-    until    = '2022-10-16',
-    count    = 1000, #recommended to specify tweets count
-    minLikes = 50,
-    lang = 'en'
-  )
+  query    = '#Bitcoin',
+  since    = '2022-10-14',
+  until    = '2022-10-16',
+  count    = 1000, #recommended to specify tweets count
+  minLikes = 50,
+  lang = 'en'
+)
 ```
 
 #### Search by location
@@ -47,13 +47,13 @@ tw <- get_tweets(
 ```
 
 #### Search by geolocation
-<a href='https://github.com/younessbahi/tweetr/blob/main/'><img src='man/figures/montreal.jpg' align="center"/></a>
+<a href='https://github.com/younessbahi/tweetr/blob/main/'><img src='man/figures/amsterdam.png' align="center"/></a>
 
 ```R
 tw <- get_tweets(
-  lat    = "45.524844", 
-  long   = "-73.645518", 
-  radius = "3km", 
+  lat    = "52.37033345325099",
+  long   = "4.878548393047705",
+  radius = "2km",
   count  = 100
 )
 ```
@@ -61,11 +61,11 @@ tw <- get_tweets(
 #### Search tweets from a user
 ```R
 user_tweets <- get_tweets(
-    from = '@elonMusk', 
-    since = '2022/01/01',
-    hasMedia = TRUE, #include only posts with media
-    replies = FALSE #exclude replies from search result
-  )
+  from = '@elonMusk',
+  since = '2022/01/01',
+  hasMedia = TRUE, #include only posts with media
+  replies = FALSE #exclude replies from search result
+)
 ```
 
 #### Influence score of a term or a hashtag
@@ -78,8 +78,8 @@ sc <- tweetr::get_score('#Bitcoin')
 #trending in London
 location <- tweetr::loc
 
-london_id <- 
-  location %>% 
+london_id <-
+  location %>%
     filter(name == 'London') %>%
     pull(woeid) %>%
     as.character #must be a string
