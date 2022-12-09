@@ -51,9 +51,9 @@ tw <- get_tweets(
 
 ```R
 tw <- get_tweets(
-  lat    = "52.37033345325099",
-  long   = "4.878548393047705",
-  radius = "2km",
+  lat    = "52.37033345325099", 
+  long   = "4.878548393047705", 
+  radius = "2km", 
   count  = 100
 )
 ```
@@ -61,11 +61,11 @@ tw <- get_tweets(
 #### Search tweets from a user
 ```R
 user_tweets <- get_tweets(
-  from = '@elonMusk',
-  since = '2022/01/01',
-  hasMedia = TRUE, #include only posts with media
-  replies = FALSE #exclude replies from search result
-)
+    from = '@elonMusk', 
+    since = '2022/01/01',
+    hasMedia = TRUE, #include only posts with media
+    replies = FALSE #exclude replies from search result
+  )
 ```
 
 #### Influence score of a term or a hashtag
