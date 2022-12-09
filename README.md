@@ -53,7 +53,7 @@ tw <- get_tweets(
 tw <- get_tweets(
   lat    = "52.37033345325099", 
   long   = "4.878548393047705", 
-  radius = "2km", 
+  radius = "1km", 
   count  = 100
 )
 ```
