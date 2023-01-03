@@ -157,7 +157,7 @@ tw_entity_clean <- function(tweets) {
     tw.urls %<>% dplyr::filter(! is.na(expanded_url))
   }
   
-  ## Mentions ####
+  ##Mentions
   #/ linkage with tweets rowID /
   mentions <-
     entities %>%
@@ -194,40 +194,92 @@ tw_entity_clean <- function(tweets) {
     
   }
   
-  ## MEDIAS ####
+  ##Photos (deprecated)
+  # if ('media' %in% names(entities)) {
+  #
+  #   photos <-
+  #     entities %>%
+  #       dplyr::select(name, media) %>%
+  #       dplyr::rename(rowID = name)
+  #
+  #   photos$media <- lapply(photos$media, function(e) { if (purrr::is_empty(e)) NA else e })
+  #
+  #   photos <-
+  #     tidyr::unnest(photos, cols = 'media')
+  #
+  #   photos_ <-
+  #     photos %>%
+  #       purrr::pluck('media') %>%
+  #       tibble::enframe('rowID') %>%
+  #       dplyr::mutate(rowID = photos$rowID) %>%
+  #       tidyr::unnest_wider(value)
+  #
+  #   photos_$id_tweet <- pull(tweets[photos_$rowID, 'id_str'])
+  #   photos           <-
+  #     photos_ %>%
+  #       dplyr::select(- c(indices, original_info, sizes)) %>%
+  #       dplyr::filter(! is.na(id_str))
+  #
+  # } else {
+  #
+  #   photos <- list()
+  #
+  # }
   
-  if (any(names(entities) == 'media')) {
+  ##Media
+  if ('extended_entities' %in% names(tweets)) {
     
-    tw.media <-
-      entities %>%
-        dplyr::select(name, media) %>%
-        dplyr::rename(rowID = name)
+    media <- tweets %>%
+      purrr::pluck('extended_entities') %>%
+      tibble::enframe('rowID') %>%
+      unnest_wider(value)
+  
+    media$media <- lapply(media$media, function(e) { if (purrr::is_empty(e) | is.null(e))  NA else e })
+  
+    media %<>%
+      filter(!is.na(media)) %>%
+      purrr::pluck('media') %>%
+        tibble::enframe() %>%
+        tidyr::unnest(value) %>%
+        unnest_wider(value)
     
-    tw.media$media <- lapply(tw.media$media, function(e) { if (purrr::is_empty(e)) NA else e })
+    #Media views count
+    viewCount = media[, 'ext'] %>% unnest(cols = ext) %>% unnest_wider(ext) %>% select(r)
+    viewCount$r <- lapply(viewCount$r, function(c) { if (is.character(c)) NA else c })
+    viewCount %<>% pluck('r') %>% enframe('rowID') %>% unnest(value) %>% unnest_wider(value)
+    media %<>% cbind(., viewCount['viewCount']) %>% select(-ext)
+
+    #Videos info
+    media$video_info <- lapply(media$video_info, function(e) { if (is.null(e)) list() else e })
+    videoInfo <- media %>%
+      pluck('video_info') %>%
+      enframe('rowID') %>%
+      unnest_wider(value)
     
-    tw.media <-
-      tidyr::unnest(tw.media, cols = 'media')
+    videoUrl <- videoInfo %>%
+      pluck('variants') %>%
+      enframe('rowID') %>%
+      unnest(value) %>% rowwise() %>%
+      filter(length(value) != 2) %>%
+      group_by(rowID) %>%
+      summarise(info = tail(value, n = 1)) %>%
+      unnest_wider(info) %>%
+      ungroup()
     
-    tw.media_ <-
-      tw.media %>%
-        purrr::pluck('media') %>%
-        tibble::enframe('rowID') %>%
-        dplyr::mutate(rowID = tw.media$rowID) %>%
-        tidyr::unnest_wider(value)
+    videoInfo %<>% left_join(., videoUrl, by = 'rowID') %>%
+      select(-rowID, -aspect_ratio, - variants) %>%
+      rename(url_video = url)
     
-    tw.media_$id_tweet <- pull(tweets[tw.media_$rowID, 'id_str'])
-    tw.media           <-
-      tw.media_ %>%
-        dplyr::select(- c(indices, original_info, sizes)) %>%
-        dplyr::filter(! is.na(id_str))
-    
+    media %<>% cbind(., videoInfo) %>%
+      select(-video_info)
+  
   } else {
     
-    tw.media <- list()
+    media <- list()
     
   }
   
-  ## GEO ####
+  ##GEO
   if (is.null(tweets[['geo']])) {
     
     tw.geo <- list()
@@ -259,12 +311,14 @@ tw_entity_clean <- function(tweets) {
     }
   }
   
+  
+  
   return(
     list(
       hashtags = hashtags,
       tw.urls  = tw.urls,
       mentions = mentions,
-      tw.media = tw.media,
+      media = media,
       geo      = tw.geo
     
     )

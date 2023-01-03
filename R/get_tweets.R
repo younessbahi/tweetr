@@ -10,6 +10,7 @@
 #' @importFrom dplyr relocate select arrange mutate rename pull filter
 #' @import httr
 #' @importFrom magrittr %<>% %>% set_colnames
+#' @importFrom operator.tools %!in%
 #' @importFrom crayon green bold yellow red
 #'
 #' @param query Can be hashtag, keyword, or a user..
@@ -150,12 +151,11 @@ get_tweets <-
         arrange(desc(at_GMT_time)) %>%
         relocate(at_GMT_time, at_UTC_time)
       
-      
-      if (any(names(tw.list) == 'display_text_range')) {
+      if ('display_text_range' %in% names(tw.list)) {
         tw.list %<>% select(- display_text_range)
       }
-      if (any(names(tw.list) == 'extended_entities')) {
-        tw.list %<>% select(- extended_entities)
+      if ('extended_entities' %in% names(tw.list)) {
+        tw.list %<>% select( - extended_entities)
       }
     }
     
@@ -200,7 +200,7 @@ get_tweets <-
           hashtags = tw_entity$hashtags,
           mentions = tw_entity$mentions,
           urls     = tw_entity$tw.urls,
-          medias   = tw_entity$tw.media,
+          media   = tw_entity$media,
           geo      = tw_entity$geo
         ),
         users              = list(
