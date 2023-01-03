@@ -12,5 +12,5 @@ globalVariables(
   "tweet_volume", "tweets", "urls", "user_id_str", "user_mentions", "users", "value",
     "favorite_count", "favourites_count", "followers_count", "friends_count",
     "media_count", "normal_followers_count", "quote_count", "reply_count",
-    "retweet_count", "statuses_count")
+    "retweet_count", "statuses_count", "r", "info", "aspect_ratio", "variants", "video_info")
 )

@@ -86,6 +86,7 @@ trends_ <- function(id) {
 #' @importFrom purrr pluck map_depth is_empty
 #' @importFrom tibble enframe
 #' @importFrom tidyr unnest_wider unnest
+#' @importFrom utils  tail
 #' @importFrom na.tools all_na
 #' @keywords internal
 #' @param tweets Tweets dataframe.
@@ -100,8 +101,6 @@ tw_entity_clean <- function(tweets) {
   
   ## Hashtags ####
   #/ linkage with tweets rowID /
-  
-  
   if (na.tools::all_na(entities$hashtags)) {
     
     hashtags <- list()
