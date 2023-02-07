@@ -10,7 +10,7 @@ globalVariables(
   "globalObjects", "id_str", "indices", "inline", "media", "name", "original_info", "result_context",
   "rounded_score", "rowID", "screen_name", "sizes", "social_context", "timeline", "tokens", "topic",
   "tweet_volume", "tweets", "urls", "user_id_str", "user_mentions", "users", "value",
-    "favorite_count", "favourites_count", "followers_count", "friends_count",
+    "favorite_count", "favourites_count", "followers_count", "friends_count", "row_id",
     "media_count", "normal_followers_count", "quote_count", "reply_count",
     "retweet_count", "statuses_count", "r", "info", "aspect_ratio", "variants", "video_info")
 )

@@ -5,36 +5,39 @@
 #' @keywords internal
 #' @noRd
 
-set_cookies_ <- function(q) {
+set_cookies_ <- function(q, s4, s2) {
   
   q.parse = urltools::url_encode(q)
-  
+ 
   tryCatch({
-    b                <- chromote::ChromoteSession$new()
-    #userAgent <- " Chrome/55.0.2883.87 Safari/537.36"
-    userAgent <- readLines('https://raw.githubusercontent.com/younessbahi/agents/main/user-agent.txt')
-    b$Network$setUserAgentOverride(userAgent = sample(userAgent, size = 1, replace = T))
+    b <- chromote::ChromoteSession$new()
   },
     error = function(e) {
-      stop("Please restart your session and try again!")
+      stop("Session expired. Please restart your session and try again!")
     })
   
   tryCatch({
+    userAgent <- glue::glue("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.{s4} Safari/537.{s2}")
+    b$Network$setUserAgentOverride(userAgent = userAgent)
     b$Page$navigate(glue::glue("https://twitter.com/search?q={q.parse}&src=typed_query&f=live"));
     b$Page$loadEventFired(wait_ = TRUE)
   },
     error   = function(e) {
-      stop('INTERNET INTERRUPTED - Please check your internet connection and retry!')
-      b$close()
+     # stop('INTERNET INTERRUPTED - Please check your internet connection and retry!')
+      b$Page$navigate(glue::glue("https://twitter.com/search?q={q.parse}&src=typed_query&f=live"));
+      b$Page$loadEventFired(wait_ = FALSE)
     },
     finally = {
       cookies_ <- b$Network$getCookies()
       cookies_ <- cookies_$cookies
     }
   )
-  
-  b$close()
-  rm(b)
+  try({
+    chromote::Chromote$close()
+    b$parent$stop()
+    b$close()
+    rm(b)
+  }, silent = T )
   
   nm       <- unlist(lapply(cookies_, '[[', 1))
   val      <- unlist(lapply(cookies_, '[[', 2))

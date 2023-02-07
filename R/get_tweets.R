@@ -49,9 +49,16 @@ get_tweets <-
     #colRm <- load('data/colRm.rda')
     
     q.parse_ = urltools::url_encode(q.clean_)
+    #userAgent <- readLines('https://raw.githubusercontent.com/younessbahi/agents/main/user-agent.txt')
+    #shuffle   <- sample(userAgent, size = 1, replace = T)
+    #cookies   <- set_cookies_(q = q.parse_, ua = shuffle)
+    #header    <- header_tweets(cookies, q = q.parse_, ua = shuffle)
     
-    cookies <- set_cookies_(q = q.parse_)
-    header  <- header_tweets(cookies, q = q.parse_)
+    s4 <- sample(1111:9999, 1, replace = TRUE)
+    s2 <- sample(11:99, 1, replace = TRUE)
+    
+    cookies <- set_cookies_(q = q.parse_, s4 = s4, s2 = s2)
+    header  <- header_tweets(cookies, q = q.parse_, s4 = s4, s2 = s2)
     
     params <- list(
       `include_profile_interstitial_type`    = '1',
@@ -81,25 +88,24 @@ get_tweets <-
       `simple_quoted_tweet`                  = 'true',
       `q`                                    = q.clean_,
       `tweet_search_mode`                    = 'live',
-      `count`                                = '60',
+      `count`                                = '20',
       `cursor`                               = '-1',
-      `query_source`                         = 'typeahead_click',
+      #`query_source`                         = 'typeahead_click',
+      `query_source`                         = 'typed_query',
       `pc`                                   = '1',
       `spelling_corrections`                 = '1',
       `include_ext_edit_control`             = 'true',
-      `include_rts` = 'false',
+      `requestContext`                       = "launch",
+      `include_rts`                          = 'false',
       `ext`                                  = 'mediaStats,highlightedLabel,hasNftAvatar,voiceInfo,enrichments,superFollowMetadata,unmentionInfo,editControl,collab_control,vibe'
     )
     
     cat(crayon::yellow(crayon::bold("Process initiated...\n")))
     
     res <- tw_scrape(count = count, header, cookies, params)
-
-  if (count != '-1') {
+    
+    cat('\r')
     cat(crayon::yellow(crayon::bold("Cleaning data...")))
-  } else {
-    cat(" | ", crayon::yellow(crayon::bold("Cleaning data...")))
-  }
     
     tryCatch({
       res.tidy <-
@@ -112,6 +118,7 @@ get_tweets <-
           dplyr::select(rowID, tweets, users)
     },
       error = function(e) {
+        
         cat(crayon::red(crayon::bold("\n[unsuccesfull]")), fill = T)
         stop(call. = T)
       }
@@ -155,7 +162,7 @@ get_tweets <-
         tw.list %<>% select(- display_text_range)
       }
       if ('extended_entities' %in% names(tw.list)) {
-        tw.list %<>% select( - extended_entities)
+        tw.list %<>% select(- extended_entities)
       }
     }
     
@@ -200,7 +207,7 @@ get_tweets <-
           hashtags = tw_entity$hashtags,
           mentions = tw_entity$mentions,
           urls     = tw_entity$tw.urls,
-          media   = tw_entity$media,
+          media    = tw_entity$media,
           geo      = tw_entity$geo
         ),
         users              = list(
@@ -208,5 +215,6 @@ get_tweets <-
           url   = user.url)
       )
     )
+    rm(list = ls())
     
   }

@@ -45,7 +45,7 @@ header_score <- function(data, q) {
     `sec-fetch-dest`            = 'empty',
     `sec-fetch-mode`            = 'cors',
     `sec-fetch-site`            = 'same-origin',
-    `user-agent`                = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36',
+    `user-agent`                = " Chrome/55.0.2883.87 Safari/537.36",
     `x-csrf-token`              = data[['ct0']],
     `x-guest-token`             = data[['gt']],
     `x-twitter-active-user`     = 'yes',
@@ -55,7 +55,7 @@ header_score <- function(data, q) {
   return(headers)
 }
 
-header_tweets <- function (data, q) {
+header_tweets <- function (data, q, s4, s2) {
   
   q.parse = urltools::url_encode(q)
   
@@ -66,7 +66,7 @@ header_tweets <- function (data, q) {
     `x-csrf-token`              = data[['ct0']],
     `sec-ch-ua-mobile`          = '?0',
     `authorization`             = 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
-    `user-agent`                = 'Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)',
+    `user-agent`                = glue::glue("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.{s4} Safari/537.{s2}"),
     `x-guest-token`             = data[['gt']],
     `x-twitter-active-user`     = 'yes',
     `x-twitter-utcoffset`       = '+0000',
