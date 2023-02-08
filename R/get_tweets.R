@@ -164,6 +164,7 @@ get_tweets <-
       if ('extended_entities' %in% names(tw.list)) {
         tw.list %<>% select(- extended_entities)
       }
+      tw.list %<>% unique()
     }
     
     if (all_na(res.tidy$users)) {
