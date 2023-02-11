@@ -322,11 +322,11 @@ tw_entity_clean <- function(tweets) {
   
   return(
     list(
-      hashtags = hashtags,
-      tw.urls  = tw.urls,
-      mentions = mentions,
-      media    = media,
-      geo      = tw.geo
+      hashtags = unique(hashtags),
+      tw.urls  = unique(tw.urls),
+      mentions = unique(mentions),
+      media    = unique(media),
+      geo      = unique(tw.geo)
     )
   )
 }
@@ -374,7 +374,8 @@ usr_entity_clean <- function(users) {
         rowID      = user.url_$rowID,
         usr_id_str = dplyr::pull(users[rowID, "id_str"])
       ) %>%
-      dplyr::select(- c(indices, rowID))
+      dplyr::select(- c(indices, rowID)) %>%
+      unique()
     
   } else {
     
