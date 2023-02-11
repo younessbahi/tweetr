@@ -201,10 +201,10 @@ get_tweets <-
     
     return(
       list(
-        tweets_count       = nrow(tw.list),
+        tweets_count       = nrow(unique(tw.list)),
         unique_users_count = length(unique(users.list$id_str)),
         tweets             = list(
-          items    = tw.list,
+          items    = unique(tw.list),
           hashtags = tw_entity$hashtags,
           mentions = tw_entity$mentions,
           urls     = tw_entity$tw.urls,
@@ -212,7 +212,7 @@ get_tweets <-
           geo      = tw_entity$geo
         ),
         users              = list(
-          items = users.list,
+          items = unique(users.list),
           url   = user.url)
       )
     )
