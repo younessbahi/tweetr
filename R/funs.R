@@ -375,6 +375,7 @@ usr_entity_clean <- function(users) {
         usr_id_str = dplyr::pull(users[rowID, "id_str"])
       ) %>%
       dplyr::select(- c(indices, rowID)) %>%
+      dplyr::filter(!is.na(url)) %>%
       unique()
     
   } else {
