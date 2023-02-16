@@ -156,7 +156,8 @@ get_tweets <-
         ) %>%
         ungroup() %>%
         arrange(desc(at_GMT_time)) %>%
-        relocate(at_GMT_time, at_UTC_time)
+        relocate(at_GMT_time, at_UTC_time) %>%
+        unique()
       
       if ('display_text_range' %in% names(tw.list)) {
         tw.list %<>% select(- display_text_range)
@@ -189,6 +190,8 @@ get_tweets <-
           followers_count        = max(followers_count),
           friends_count          = max(friends_count),
           normal_followers_count = max(normal_followers_count),
+          fast_followers_count   = max(fast_followers_count),
+          listed_count           = max(listed_count),
           statuses_count         = max(statuses_count),
           media_count            = max(media_count),
           favourites_count       = max(favourites_count)
@@ -204,7 +207,7 @@ get_tweets <-
         tweets_count       = nrow(unique(tw.list)),
         unique_users_count = length(unique(users.list$id_str)),
         tweets             = list(
-          items    = unique(tw.list),
+          items    = tw.list,
           hashtags = tw_entity$hashtags,
           mentions = tw_entity$mentions,
           urls     = tw_entity$tw.urls,
