@@ -87,6 +87,7 @@ trends_ <- function(id) {
 #' @importFrom tibble enframe
 #' @importFrom tidyr unnest_wider unnest
 #' @importFrom utils  tail
+#' @importFrom operator.tools %!in%
 #' @importFrom na.tools all_na
 #' @keywords internal
 #' @param tweets Tweets dataframe.
