@@ -43,12 +43,13 @@ tw_scrape <- function(count, header, cookies, params) {
         Sys.sleep(10)
         
       } else if (res$status_code == 403) break
-      
-      
+  
+      if (res$status_code == 200) {
       res_       <- httr::content(res)
-      iter.count <- sum(lengths(res_$globalObjects$tweets, use.names = F) != 0) + iter.count
+      try({ iter.count <- sum(lengths(res_$globalObjects$tweets, use.names = F) != 0) + iter.count }, silent = T)
       
-      if (last.iter == iter.count & res$status_code == 200) break
+      if (last.iter == iter.count) break
+      
       cat('\r')
       cat(
         crayon::blue('So far'),
@@ -57,7 +58,7 @@ tw_scrape <- function(count, header, cookies, params) {
         crayon::blue('| Status:'),
         if (res$status_code == 200) crayon::green(res$status_code) else crayon::red(res$status_code)
       )
-      if (res$status_code == 200) {
+      
         if (i != 1) {
           
           last <-
