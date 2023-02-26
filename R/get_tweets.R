@@ -103,11 +103,12 @@ get_tweets <-
     cat(crayon::yellow(crayon::bold("Process initiated...\n")))
     
     res <- tw_scrape(count = count, header, cookies, params)
-    
     cat('\r')
-    cat(crayon::yellow(crayon::bold("Cleaning data...")))
     
-    tryCatch({
+    if (length(res) != 0) {
+      
+      cat(crayon::yellow(crayon::bold("Cleaning data...")))
+      
       res.tidy <-
         res %>%
           purrr::pluck() %>%
@@ -116,109 +117,121 @@ get_tweets <-
           dplyr::select(- timeline) %>%
           tidyr::unnest_wider(globalObjects) %>%
           dplyr::select(rowID, tweets, users)
-    },
-      error = function(e) {
+      
+      if (all_na(res.tidy$tweets)) {
         
-        cat(crayon::red(crayon::bold("\n[unsuccesfull]")), fill = T)
-        stop(call. = T)
-      }
-    )
-    
-    if (all_na(res.tidy$tweets)) {
-      
-      tw.list            <- list()
-      tw_entity          <- list()
-      tw_entity$hashtags <- list()
-      tw_entity$mentions <- list()
-      tw_entity$tw.urls  <- list()
-      tw_entity$tw.media <- list()
-      tw_entity$geo      <- list()
-      
-    } else {
-      
-      tw.list <-
-        tidy_(res.tidy$tweets) %>%
+        tw.list            <- list()
+        tw_entity          <- list()
+        tw_entity$hashtags <- list()
+        tw_entity$mentions <- list()
+        tw_entity$tw.urls  <- list()
+        tw_entity$tw.media <- list()
+        tw_entity$geo      <- list()
+        
+      } else {
+        
+        tw.list <-
+          tidy_(res.tidy$tweets) %>%
+            mutate(
+              at_GMT_time = parse_datetime(created_at) + 3600,
+              at_UTC_time = parse_datetime(created_at)
+            )
+        
+        tw_entity <- suppressMessages(tw_entity_clean(tweets = tw.list))
+        
+        tw.list %<>%
+          select(- c(rowID, created_at, entities, ext, ext_edit_control)) %>%
+          group_by(id_str) %>%
           mutate(
-            at_GMT_time = parse_datetime(created_at) + 3600,
-            at_UTC_time = parse_datetime(created_at)
-          )
-      
-      tw_entity <- suppressMessages(tw_entity_clean(tweets = tw.list))
-      
-      tw.list %<>%
-        select(- c(rowID, created_at, entities, ext, ext_edit_control)) %>%
-        group_by(id_str) %>%
-        mutate(
-          retweet_count  = max(retweet_count),
-          favorite_count = max(favorite_count),
-          reply_count    = max(reply_count),
-          quote_count    = max(quote_count)
-        ) %>%
-        ungroup() %>%
-        arrange(desc(at_GMT_time)) %>%
-        relocate(at_GMT_time, at_UTC_time) %>%
-        unique()
-      
-      if ('display_text_range' %in% names(tw.list)) {
-        tw.list %<>% select(- display_text_range)
+            retweet_count  = max(retweet_count),
+            favorite_count = max(favorite_count),
+            reply_count    = max(reply_count),
+            quote_count    = max(quote_count)
+          ) %>%
+          ungroup() %>%
+          arrange(desc(at_GMT_time)) %>%
+          relocate(at_GMT_time, at_UTC_time) %>%
+          unique()
+        
+        if ('display_text_range' %in% names(tw.list)) {
+          tw.list %<>% select(- display_text_range)
+        }
+        if ('extended_entities' %in% names(tw.list)) {
+          tw.list %<>% select(- extended_entities)
+        }
+        tw.list %<>% unique()
       }
-      if ('extended_entities' %in% names(tw.list)) {
-        tw.list %<>% select(- extended_entities)
-      }
-      tw.list %<>% unique()
-    }
-    
-    if (all_na(res.tidy$users)) {
       
-      users.list <- list()
-      user.url   <- list()
-      
-    } else {
-      users.list <-
-        tidy_(res.tidy$users) %>%
+      if (all_na(res.tidy$users)) {
+        
+        users.list <- list()
+        user.url   <- list()
+        
+      } else {
+        users.list <-
+          tidy_(res.tidy$users) %>%
+            mutate(
+              created_at = parse_datetime(created_at) + 3600
+            )
+        
+        index_rm <- cRm[which(cRm$to_rm %in% names(users.list)),]$to_rm
+        users.list %<>% select(- all_of(index_rm))
+        user.url <- suppressMessages(usr_entity_clean(users = users.list))
+        users.list %<>%
+          select(- entities) %>%
+          group_by(id_str) %>%
           mutate(
-            created_at = parse_datetime(created_at) + 3600
-          )
+            followers_count        = max(followers_count),
+            friends_count          = max(friends_count),
+            normal_followers_count = max(normal_followers_count),
+            fast_followers_count   = max(fast_followers_count),
+            listed_count           = max(listed_count),
+            statuses_count         = max(statuses_count),
+            media_count            = max(media_count),
+            favourites_count       = max(favourites_count)
+          ) %>%
+          ungroup()
+      }
       
-      index_rm <- cRm[which(cRm$to_rm %in% names(users.list)),]$to_rm
-      users.list %<>% select(- all_of(index_rm))
-      user.url <- suppressMessages(usr_entity_clean(users = users.list))
-      users.list %<>%
-        select(- entities) %>%
-        group_by(id_str) %>%
-        mutate(
-          followers_count        = max(followers_count),
-          friends_count          = max(friends_count),
-          normal_followers_count = max(normal_followers_count),
-          fast_followers_count   = max(fast_followers_count),
-          listed_count           = max(listed_count),
-          statuses_count         = max(statuses_count),
-          media_count            = max(media_count),
-          favourites_count       = max(favourites_count)
-        ) %>%
-        ungroup()
-    }
-    
-    cat('\r');
-    cat(crayon::green(crayon::bold('[successful]')), fill = T)
-    
-    return(
-      list(
-        tweets_count       = nrow(unique(tw.list)),
-        unique_users_count = length(unique(users.list$id_str)),
-        tweets             = list(
-          items    = tw.list,
-          hashtags = tw_entity$hashtags,
-          mentions = tw_entity$mentions,
-          urls     = tw_entity$tw.urls,
-          media    = tw_entity$media,
-          geo      = tw_entity$geo
-        ),
-        users              = list(
-          items = unique(users.list),
-          url   = user.url)
+      cat('\r');
+      cat(crayon::green(crayon::bold('[successful]')), fill = T)
+      
+      return(
+        list(
+          tweets_count       = nrow(unique(tw.list)),
+          unique_users_count = length(unique(users.list$id_str)),
+          tweets             = list(
+            items    = tw.list,
+            hashtags = tw_entity$hashtags,
+            mentions = tw_entity$mentions,
+            urls     = tw_entity$tw.urls,
+            media    = tw_entity$media,
+            geo      = tw_entity$geo
+          ),
+          users              = list(
+            items = unique(users.list),
+            url   = user.url)
+        )
       )
-    )
-    rm(list = ls())
-    
+      rm(list = ls())
+    } else {
+      return(
+        list(
+          tweets_count       = 0,
+          unique_users_count = 0,
+          tweets             = list(
+            items    = list(),
+            hashtags = list(),
+            mentions = list(),
+            urls     = list(),
+            media    = list(),
+            geo      = list()
+          ),
+          users              = list(
+            items = list(),
+            url   = list()
+          )
+        )
+      )
+    }
   }
