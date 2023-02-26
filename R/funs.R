@@ -234,7 +234,7 @@ tw_entity_clean <- function(tweets) {
       tidyr::unnest_wider(value)
     
     media$media <- lapply(media$media, function(e) { if (purrr::is_empty(e) | is.null(e))  NA else e })
-
+    
     media %<>%
       filter(! is.na(media)) %>%
       #purrr::pluck('media') %>%
@@ -243,6 +243,7 @@ tw_entity_clean <- function(tweets) {
       tidyr::unnest_wider(media)
     
     #Media views count
+    #todo:task 2 failed - "Can't subset columns that don't exist.✖ Column `viewCount` doesn't exist."
     viewCount = media[, 'ext'] %>%
       tidyr::unnest(cols = ext) %>%
       tidyr::unnest_wider(ext) %>%
@@ -253,33 +254,50 @@ tw_entity_clean <- function(tweets) {
       tibble::enframe('rowID') %>%
       tidyr::unnest(value) %>%
       tidyr::unnest_wider(value)
-    media %<>% cbind(., viewCount['viewCount']) %>% dplyr::select(- ext)
+    
+    if ('viewCount' %in% colnames(viewCount)) {
+      media %<>% cbind(., viewCount['viewCount']) %>% dplyr::select(- ext)
+    }
     
     #Videos info
-    media$video_info <- lapply(media$video_info, function(e) { if (is.null(e)) list() else e })
-    videoInfo        <- media %>%
-      purrr::pluck('video_info') %>%
-      tibble::enframe('rowID') %>%
-      tidyr::unnest_wider(value)
+    if ('video_info' %in% colnames(media)) {
+      media$video_info <- lapply(media$video_info, function(e) { if (is.null(e)) list() else e })
+      videoInfo        <- media %>%
+        purrr::pluck('video_info') %>%
+        tibble::enframe('rowID') %>%
+        tidyr::unnest_wider(value)
+      
+      videoUrl <- videoInfo %>%
+        purrr::pluck('variants') %>%
+        tibble::enframe('rowID') %>%
+        tidyr::unnest(value) %>%
+        dplyr::rowwise() %>%
+        dplyr::filter(length(value) != 2) %>%
+        dplyr::group_by(rowID) %>%
+        dplyr::summarise(info = tail(value, n = 1)) %>%
+        tidyr::unnest_wider(info) %>%
+        dplyr::ungroup()
+      
+      videoInfo %<>% dplyr::left_join(., videoUrl, by = 'rowID') %>%
+        dplyr::select(- rowID, - aspect_ratio, - variants) %>%
+        dplyr::rename(url_video = url)
+      
+      media %<>% cbind(., videoInfo) %>%
+        mutate(tw_id_str = tweets[["id_str"]][row_id]) %>%
+        dplyr::select(- video_info, - row_id)
+    }
     
-    videoUrl <- videoInfo %>%
-      purrr::pluck('variants') %>%
-      tibble::enframe('rowID') %>%
-      tidyr::unnest(value) %>%
-      dplyr::rowwise() %>%
-      dplyr::filter(length(value) != 2) %>%
-      dplyr::group_by(rowID) %>%
-      dplyr::summarise(info = tail(value, n = 1)) %>%
-      tidyr::unnest_wider(info) %>%
-      dplyr::ungroup()
+    media_names <- c(
+      "id", "id_str", "indices", "media_url", "media_url_https", "url", "display_url", "expanded_url", "type", "original_info", "sizes", "media_key", "ext_sensitive_media_warning", "ext_media_availability", "ext_alt_text",
+      "ext_media_color", "additional_media_info", "source_status_id", "source_status_id_str", "source_user_id", "source_user_id_str", "viewCount", "duration_millis", "bitrate", "content_type", "url_video", "tw_id_str"
+    )
     
-    videoInfo %<>% dplyr::left_join(., videoUrl, by = 'rowID') %>%
-      dplyr::select(- rowID, - aspect_ratio, - variants) %>%
-      dplyr::rename(url_video = url)
+    if (any(media_names %!in% colnames(media))) {
+      vars_ <- media_names[which(media_names %!in% colnames(media))]
+      media <- cbind(media, setNames(lapply(vars_, function(x) x = NA), vars_)) %>%
+        select(media_names)
+    }
     
-    media %<>% cbind(., videoInfo) %>%
-      mutate(tw_id_str = tweets[["id_str"]][row_id]) %>%
-      dplyr::select(- video_info, - row_id)
     
   } else {
     
@@ -375,7 +393,7 @@ usr_entity_clean <- function(users) {
         usr_id_str = dplyr::pull(users[rowID, "id_str"])
       ) %>%
       dplyr::select(- c(indices, rowID)) %>%
-      dplyr::filter(!is.na(url)) %>%
+      dplyr::filter(! is.na(url)) %>%
       unique()
     
   } else {
